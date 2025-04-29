@@ -1,0 +1,553 @@
+# 步骤10：测试与维护
+
+## 添加单元测试
+
+1. 安装测试工具：
+   ```bash
+   npm install --save-dev jest @testing-library/react @testing-library/jest-dom jest-environment-jsdom
+   ```
+
+2. 创建 `jest.config.js` 文件：
+   ```javascript
+   const nextJest = require('next/jest');
+
+   const createJestConfig = nextJest({
+     // 指向Next.js应用的路径
+     dir: './',
+   });
+
+   // 自定义Jest配置
+   const customJestConfig = {
+     setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+     testEnvironment: 'jest-environment-jsdom',
+     moduleNameMapper: {
+       '^@/components/(.*)$': '<rootDir>/src/components/$1',
+       '^@/app/(.*)$': '<rootDir>/src/app/$1',
+       '^@/lib/(.*)$': '<rootDir>/src/lib/$1',
+       '^@/data/(.*)$': '<rootDir>/src/data/$1',
+       '^@/context/(.*)$': '<rootDir>/src/context/$1',
+     },
+   };
+
+   // createJestConfig会自动处理一些配置，如转换路径别名
+   module.exports = createJestConfig(customJestConfig);
+   ```
+
+3. 创建 `jest.setup.js` 文件：
+   ```javascript
+   import '@testing-library/jest-dom';
+   ```
+
+4. 在 `package.json` 中添加测试脚本：
+   ```json
+   "scripts": {
+     "dev": "next dev",
+     "build": "next build",
+     "start": "next start",
+     "lint": "next lint",
+     "test": "jest",
+     "test:watch": "jest --watch"
+   }
+   ```
+
+5. 创建组件测试示例。创建 `src/components/__tests__/Navbar.test.jsx`：
+   ```jsx
+   import { render, screen } from '@testing-library/react';
+   import Navbar from '../Navbar';
+
+   // 模拟ThemeContext
+   jest.mock('@/context/ThemeContext', () => ({
+     useTheme: () => ({
+       darkMode: true,
+       toggleDarkMode: jest.fn(),
+       mounted: true,
+     }),
+   }));
+
+   describe('Navbar', () => {
+     it('renders the logo and navigation links', () => {
+       render(<Navbar />);
+       
+       // 检查logo是否存在
+       expect(screen.getByText(/你的名字\.tech/i)).toBeInTheDocument();
+       
+       // 检查导航链接是否存在
+       expect(screen.getByText(/首页/i)).toBeInTheDocument();
+       expect(screen.getByText(/项目/i)).toBeInTheDocument();
+       expect(screen.getByText(/博客/i)).toBeInTheDocument();
+       expect(screen.getByText(/联系/i)).toBeInTheDocument();
+     });
+   });
+   ```
+
+6. 创建工具函数测试示例。创建 `src/lib/__tests__/utils.test.js`：
+   ```javascript
+   import { formatDate } from '../utils';
+
+   describe('formatDate', () => {
+     it('formats date correctly', () => {
+       const date = '2023-01-01';
+       const formattedDate = formatDate(date);
+       
+       // 根据你的格式化函数调整预期结果
+       expect(formattedDate).toBe('2023年01月01日');
+     });
+   });
+   ```
+
+## 添加端到端测试
+
+1. 安装Cypress：
+   ```bash
+   npm install --save-dev cypress
+   ```
+
+2. 在 `package.json` 中添加Cypress脚本：
+   ```json
+   "scripts": {
+     "dev": "next dev",
+     "build": "next build",
+     "start": "next start",
+     "lint": "next lint",
+     "test": "jest",
+     "test:watch": "jest --watch",
+     "cypress": "cypress open",
+     "cypress:headless": "cypress run",
+     "test:e2e": "start-server-and-test dev http://localhost:3000 cypress"
+   }
+   ```
+
+3. 初始化Cypress：
+   ```bash
+   npx cypress open
+   ```
+
+4. 创建基本的端到端测试。创建 `cypress/e2e/home.cy.js`：
+   ```javascript
+   describe('Home Page', () => {
+     beforeEach(() => {
+       cy.visit('/');
+     });
+
+     it('displays the hero section with correct content', () => {
+       cy.get('h1').should('contain', '你好，我是你的名字');
+       cy.contains('正在学习编程与开发').should('be.visible');
+     });
+
+     it('navigates to projects page when clicking the projects link', () => {
+       cy.contains('项目').click();
+       cy.url().should('include', '/projects');
+       cy.get('h1').should('contain', '我的项目');
+     });
+
+     it('navigates to blog page when clicking the blog link', () => {
+       cy.contains('博客').click();
+       cy.url().should('include', '/blog');
+       cy.get('h1').should('contain', '我的博客');
+     });
+
+     it('toggles dark mode when clicking the theme toggle button', () => {
+       // 获取初始主题状态
+       cy.get('html').then(($html) => {
+         const initialIsDark = $html.hasClass('dark');
+         
+         // 点击主题切换按钮
+         cy.get('button[aria-label*="切换"]').first().click();
+         
+         // 检查主题是否已切换
+         cy.get('html').should(initialIsDark ? 'not.have.class' : 'have.class', 'dark');
+       });
+     });
+   });
+   ```
+
+5. 创建博客页面测试。创建 `cypress/e2e/blog.cy.js`：
+   ```javascript
+   describe('Blog Page', () => {
+     beforeEach(() => {
+       cy.visit('/blog');
+     });
+
+     it('displays the blog title', () => {
+       cy.get('h1').should('contain', '我的博客');
+     });
+
+     it('displays blog posts', () => {
+       cy.get('article').should('have.length.at.least', 1);
+     });
+
+     it('filters posts when clicking on a tag', () => {
+       // 假设有一个标签按钮
+       cy.contains('button', '编程').click();
+       
+       // 检查URL是否包含标签参数
+       cy.url().should('include', 'tag=编程');
+       
+       // 检查是否只显示带有该标签的文章
+       cy.get('article').each(($article) => {
+         cy.wrap($article).should('contain', '编程');
+       });
+     });
+
+     it('navigates to blog post when clicking on a post', () => {
+       // 点击第一篇博客文章
+       cy.get('article').first().click();
+       
+       // 检查URL是否包含博客文章的slug
+       cy.url().should('include', '/blog/');
+       
+       // 检查是否显示文章内容
+       cy.get('article h1').should('be.visible');
+     });
+   });
+   ```
+
+## 添加性能测试
+
+1. 安装Lighthouse CI：
+   ```bash
+   npm install --save-dev @lhci/cli
+   ```
+
+2. 创建 `lighthouserc.js` 文件：
+   ```javascript
+   module.exports = {
+     ci: {
+       collect: {
+         startServerCommand: 'npm run start',
+         url: ['http://localhost:3000/', 'http://localhost:3000/blog', 'http://localhost:3000/projects'],
+         numberOfRuns: 3,
+       },
+       upload: {
+         target: 'temporary-public-storage',
+       },
+       assert: {
+         preset: 'lighthouse:recommended',
+         assertions: {
+           'categories:performance': ['warn', { minScore: 0.8 }],
+           'categories:accessibility': ['error', { minScore: 0.9 }],
+           'categories:best-practices': ['warn', { minScore: 0.9 }],
+           'categories:seo': ['warn', { minScore: 0.9 }],
+         },
+       },
+     },
+   };
+   ```
+
+3. 在 `package.json` 中添加Lighthouse脚本：
+   ```json
+   "scripts": {
+     "lighthouse": "lhci autorun"
+   }
+   ```
+
+## 设置持续集成
+
+1. 创建 `.github/workflows/ci.yml` 文件（如果你使用GitHub）：
+   ```yaml
+   name: CI
+
+   on:
+     push:
+       branches: [main]
+     pull_request:
+       branches: [main]
+
+   jobs:
+     lint:
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@v3
+         - uses: actions/setup-node@v3
+           with:
+             node-version: 18
+             cache: 'npm'
+         - run: npm ci
+         - run: npm run lint
+
+     test:
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@v3
+         - uses: actions/setup-node@v3
+           with:
+             node-version: 18
+             cache: 'npm'
+         - run: npm ci
+         - run: npm test
+
+     e2e:
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@v3
+         - uses: actions/setup-node@v3
+           with:
+             node-version: 18
+             cache: 'npm'
+         - run: npm ci
+         - name: Cypress run
+           uses: cypress-io/github-action@v5
+           with:
+             build: npm run build
+             start: npm start
+             wait-on: 'http://localhost:3000'
+
+     lighthouse:
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@v3
+         - uses: actions/setup-node@v3
+           with:
+             node-version: 18
+             cache: 'npm'
+         - run: npm ci
+         - run: npm run build
+         - name: Run Lighthouse CI
+           run: |
+             npm install -g @lhci/cli@0.11.x
+             lhci autorun
+   ```
+
+## 设置错误监控
+
+1. 安装Sentry：
+   ```bash
+   npm install @sentry/nextjs
+   ```
+
+2. 创建 `sentry.client.config.js` 文件：
+   ```javascript
+   import * as Sentry from '@sentry/nextjs';
+
+   Sentry.init({
+     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+     tracesSampleRate: 1.0,
+     debug: process.env.NODE_ENV === 'development',
+   });
+   ```
+
+3. 创建 `sentry.server.config.js` 文件：
+   ```javascript
+   import * as Sentry from '@sentry/nextjs';
+
+   Sentry.init({
+     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+     tracesSampleRate: 1.0,
+     debug: process.env.NODE_ENV === 'development',
+   });
+   ```
+
+4. 更新 `next.config.js` 文件：
+   ```javascript
+   /** @type {import('next').NextConfig} */
+   const { withSentryConfig } = require('@sentry/nextjs');
+
+   const nextConfig = {
+     // 你的Next.js配置
+   };
+
+   const sentryWebpackPluginOptions = {
+     // 更多选项请参考：https://github.com/getsentry/sentry-webpack-plugin#options
+     silent: true,
+   };
+
+   module.exports = withSentryConfig(nextConfig, sentryWebpackPluginOptions);
+   ```
+
+## 创建维护计划
+
+1. 创建 `MAINTENANCE.md` 文件：
+   ```markdown
+   # 网站维护计划
+
+   ## 定期维护任务
+
+   ### 每周
+   - 检查网站是否正常运行
+   - 检查所有链接是否有效
+   - 备份数据库（如果适用）
+
+   ### 每月
+   - 更新依赖包（运行 `npm outdated` 和 `npm update`）
+   - 检查性能指标
+   - 添加新的博客文章或项目
+
+   ### 每季度
+   - 进行全面的安全审查
+   - 更新内容（项目、技能等）
+   - 检查SEO表现
+
+   ### 每年
+   - 更新版权年份
+   - 重新设计或更新UI（如果需要）
+   - 检查和更新个人信息
+
+   ## 更新流程
+
+   1. 创建新的分支进行更改
+   2. 在本地测试更改
+   3. 提交更改并创建Pull Request
+   4. 代码审查
+   5. 合并到主分支
+   6. 部署到生产环境
+
+   ## 监控
+
+   - 使用Google Analytics监控流量
+   - 使用Sentry监控错误
+   - 使用Uptime Robot监控网站可用性
+
+   ## 备份策略
+
+   - 代码：GitHub仓库
+   - 内容：定期导出博客文章和项目数据
+   - 数据库：每周自动备份（如果适用）
+
+   ## 紧急情况处理
+
+   如果网站出现问题：
+
+   1. 检查Sentry错误报告
+   2. 检查服务器日志
+   3. 如果需要，回滚到上一个稳定版本
+   4. 修复问题并部署更新
+   ```
+
+## 添加文档
+
+1. 创建 `README.md` 文件：
+   ```markdown
+   # 个人网站
+
+   这是我的个人网站，使用Next.js和React构建，用于展示我的项目和博客。
+
+   ## 技术栈
+
+   - Next.js
+   - React
+   - Tailwind CSS
+   - Jest (测试)
+   - Cypress (端到端测试)
+
+   ## 功能
+
+   - 响应式设计
+   - 暗黑模式
+   - 博客系统
+   - 项目展示
+   - 联系表单
+
+   ## 开发
+
+   ### 安装依赖
+
+   ```bash
+   npm install
+   ```
+
+   ### 运行开发服务器
+
+   ```bash
+   npm run dev
+   ```
+
+   ### 构建生产版本
+
+   ```bash
+   npm run build
+   ```
+
+   ### 运行测试
+
+   ```bash
+   # 单元测试
+   npm test
+
+   # 端到端测试
+   npm run cypress
+   ```
+
+   ## 部署
+
+   该网站部署在Vercel上。每次推送到主分支时，都会自动部署。
+
+   ## 目录结构
+
+   ```
+   ├── public/             # 静态文件
+   ├── src/                # 源代码
+   │   ├── app/            # Next.js App Router
+   │   ├── components/     # React组件
+   │   ├── context/        # React上下文
+   │   ├── data/           # 数据文件
+   │   │   ├── posts/      # 博客文章
+   │   │   └── projects/   # 项目数据
+   │   └── lib/            # 工具函数
+   ├── .env.example        # 环境变量示例
+   ├── .gitignore          # Git忽略文件
+   ├── jest.config.js      # Jest配置
+   ├── next.config.js      # Next.js配置
+   ├── package.json        # 项目依赖
+   ├── tailwind.config.js  # Tailwind CSS配置
+   └── tsconfig.json       # TypeScript配置
+   ```
+
+   ## 许可证
+
+   MIT
+   ```
+
+2. 创建 `CONTRIBUTING.md` 文件：
+   ```markdown
+   # 贡献指南
+
+   感谢你考虑为这个项目做出贡献！
+
+   ## 开发流程
+
+   1. Fork这个仓库
+   2. 创建你的特性分支 (`git checkout -b feature/amazing-feature`)
+   3. 提交你的更改 (`git commit -m 'Add some amazing feature'`)
+   4. 推送到分支 (`git push origin feature/amazing-feature`)
+   5. 创建一个Pull Request
+
+   ## 代码风格
+
+   - 使用ESLint和Prettier保持代码风格一致
+   - 遵循组件命名约定（PascalCase）
+   - 使用有意义的变量和函数名
+
+   ## 提交消息规范
+
+   请使用以下格式编写提交消息：
+
+   ```
+   类型(范围): 简短描述
+
+   详细描述（如果需要）
+   ```
+
+   类型可以是：
+   - feat: 新功能
+   - fix: 修复bug
+   - docs: 文档更改
+   - style: 不影响代码含义的更改（空格、格式等）
+   - refactor: 既不修复bug也不添加功能的代码更改
+   - perf: 提高性能的代码更改
+   - test: 添加或修改测试
+   - chore: 对构建过程或辅助工具的更改
+
+   ## 测试
+
+   - 为新功能添加测试
+   - 确保所有测试通过
+   - 更新现有测试以反映代码更改
+
+   ## 问题和功能请求
+
+   - 使用GitHub Issues提交问题或功能请求
+   - 清晰描述问题或请求
+   - 如果报告bug，请提供重现步骤
+   ```
+
+完成这些步骤后，你将拥有一个完整的测试和维护计划，包括单元测试、端到端测试、性能测试、持续集成、错误监控和文档。

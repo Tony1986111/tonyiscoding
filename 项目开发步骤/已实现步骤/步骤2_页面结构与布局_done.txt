@@ -1,0 +1,161 @@
+# 步骤2：页面结构与布局
+
+/*
+已完成工作：
+1. 创建了基础布局组件（Navbar, Footer）
+2. 创建了可复用组件（Hero, ProjectCard, BlogPostCard）
+3. 创建了暗黑模式上下文（ThemeContext）
+4. 更新了根布局文件以使用ThemeProvider
+5. 更新了主页以使用组件化结构
+6. 创建了其他页面（项目页、博客页、联系页）
+7. 设置了导航链接
+*/
+
+## 创建基础布局
+
+1. 编辑 `src/app/layout.js` 文件，设置全局布局：
+   ```jsx
+   import { ThemeProvider } from '@/context/ThemeContext';
+   import './globals.css'
+   
+   export const metadata = {
+     title: '个人网站',
+     description: '展示我的IT项目和博客的个人网站',
+   }
+   
+   export default function RootLayout({ children }) {
+     return (
+       <html lang="zh">
+         <body>
+           <ThemeProvider>
+             {children}
+           </ThemeProvider>
+         </body>
+       </html>
+     )
+   }
+   ```
+
+## 创建可复用组件
+
+1. 在 `src/components` 目录下创建以下组件：
+
+   - `Navbar.jsx` - 导航栏组件
+   - `Footer.jsx` - 页脚组件
+   - `Hero.jsx` - 首页英雄区组件
+   - `ProjectCard.jsx` - 项目卡片组件
+   - `BlogPostCard.jsx` - 博客文章卡片组件
+
+2. 从你的 `home.js` 文件中提取相应的代码到这些组件中，使它们可以在不同页面复用
+
+## 创建主页
+
+1. 修改 `src/app/page.js`，使用组件化结构：
+   ```jsx
+   import { useTheme } from '@/context/ThemeContext';
+   import Navbar from '@/components/Navbar';
+   import Footer from '@/components/Footer';
+   import Hero from '@/components/Hero';
+   
+   export default function Home() {
+     const { darkMode } = useTheme();
+     
+     return (
+       <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
+         <Navbar />
+         <main>
+           <Hero />
+           {/* 其他部分... */}
+         </main>
+         <Footer />
+       </div>
+     );
+   }
+   ```
+
+## 创建其他页面
+
+1. 创建项目页面 `src/app/projects/page.js`：
+   ```jsx
+   import Navbar from '@/components/Navbar';
+   import Footer from '@/components/Footer';
+   import ProjectCard from '@/components/ProjectCard';
+   
+   export default function Projects() {
+     return (
+       <div>
+         <Navbar />
+         <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+           <h1 className="text-3xl font-bold mb-8">我的项目</h1>
+           <div className="grid md:grid-cols-2 gap-8">
+             {/* 这里将展示你的项目 */}
+           </div>
+         </main>
+         <Footer />
+       </div>
+     )
+   }
+   ```
+
+2. 创建博客页面 `src/app/blog/page.js`：
+   ```jsx
+   import Navbar from '@/components/Navbar';
+   import Footer from '@/components/Footer';
+   import BlogPostCard from '@/components/BlogPostCard';
+   
+   export default function Blog() {
+     return (
+       <div>
+         <Navbar />
+         <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+           <h1 className="text-3xl font-bold mb-8">我的博客</h1>
+           <div className="grid md:grid-cols-2 gap-8">
+             {/* 这里将展示你的博客文章 */}
+           </div>
+         </main>
+         <Footer />
+       </div>
+     )
+   }
+   ```
+
+3. 创建联系页面 `src/app/contact/page.js`：
+   ```jsx
+   import Navbar from '@/components/Navbar';
+   import Footer from '@/components/Footer';
+   
+   export default function Contact() {
+     return (
+       <div>
+         <Navbar />
+         <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+           <h1 className="text-3xl font-bold mb-8">联系我</h1>
+           <form className="max-w-lg">
+             {/* 联系表单 */}
+           </form>
+         </main>
+         <Footer />
+       </div>
+     )
+   }
+   ```
+
+## 设置导航链接
+
+1. 更新 `Navbar.jsx` 组件，确保导航链接指向正确的页面：
+   ```jsx
+   <Link href="/">首页</Link>
+   <Link href="/projects">项目</Link>
+   <Link href="/blog">博客</Link>
+   <Link href="/contact">联系</Link>
+   ```
+
+2. 在Next.js中，使用`Link`组件而不是`a`标签进行内部导航：
+   ```jsx
+   import Link from 'next/link'
+   
+   // 使用方式
+   <Link href="/">首页</Link>
+   ```
+
+完成这些步骤后，你将拥有一个基本的多页面网站结构，包括主页、项目页、博客页和联系页。

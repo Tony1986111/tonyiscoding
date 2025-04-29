@@ -1,0 +1,226 @@
+# Step 5: Styling and Theming
+
+/*
+Completed work:
+1. Updated Tailwind configuration to support typography plugin
+2. Added custom component styles in globals.css
+3. Improved dark mode implementation with client-side detection
+4. Added custom fonts (Inter and Poppins) from Google Fonts
+5. Created animation styles for better user experience
+6. Updated personal information with correct details
+*/
+
+## Tailwind Configuration
+
+1. Installed typography plugin:
+   ```bash
+   npm install @tailwindcss/typography
+   ```
+
+2. Updated `tailwind.config.js` to include the plugin:
+   ```javascript
+   module.exports = {
+     // ...other config
+     plugins: [
+       require('@tailwindcss/typography'),
+     ],
+   };
+   ```
+
+3. Added custom font configuration:
+   ```javascript
+   theme: {
+     extend: {
+       // ...other extensions
+       fontFamily: {
+         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+         heading: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
+       },
+     },
+   },
+   ```
+
+## Global Styles
+
+1. Updated `src/app/globals.css` with custom component styles:
+   ```css
+   /* Custom component styles */
+   @layer components {
+     .btn {
+       @apply px-4 py-2 rounded-lg font-medium transition;
+     }
+
+     .btn-primary {
+       @apply bg-blue-500 text-white hover:bg-blue-600;
+     }
+
+     .btn-secondary {
+       @apply bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700;
+     }
+
+     .card {
+       @apply rounded-xl overflow-hidden shadow-lg transition hover:scale-[1.02] bg-white dark:bg-gray-800;
+     }
+
+     .section-title {
+       @apply text-2xl font-bold mb-8;
+     }
+
+     .section-divider {
+       @apply flex items-center mb-8;
+     }
+
+     .section-divider::after {
+       @apply flex-grow ml-4 h-px bg-gray-200 dark:bg-gray-800;
+       content: '';
+     }
+   }
+   ```
+
+2. Added animation styles:
+   ```css
+   /* Animations */
+   @keyframes fadeIn {
+     from {
+       opacity: 0;
+       transform: translateY(10px);
+     }
+     to {
+       opacity: 1;
+       transform: translateY(0);
+     }
+   }
+
+   .animate-fadeIn {
+     animation: fadeIn 0.5s ease-out forwards;
+   }
+   ```
+
+## Dark Mode Implementation
+
+1. Updated `src/context/ThemeContext.jsx` to improve dark mode implementation:
+   ```jsx
+   export function ThemeProvider({ children }) {
+     const [darkMode, setDarkMode] = useState(true);
+     const [mounted, setMounted] = useState(false);
+     
+     // Check user's previous preference after client-side mount
+     useEffect(() => {
+       setMounted(true);
+       const savedTheme = localStorage.getItem('theme');
+       if (savedTheme) {
+         setDarkMode(savedTheme === 'dark');
+       } else {
+         // Check system preference
+         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+         setDarkMode(prefersDark);
+       }
+     }, []);
+     
+     // Save user preference and apply class
+     useEffect(() => {
+       if (mounted) {
+         localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+         // Update HTML element class to apply global styles
+         if (darkMode) {
+           document.documentElement.classList.add('dark');
+         } else {
+           document.documentElement.classList.remove('dark');
+         }
+       }
+     }, [darkMode, mounted]);
+     
+     // Provide a value indicating whether theme has loaded
+     const value = {
+       darkMode,
+       toggleDarkMode,
+       mounted
+     };
+     
+     return (
+       <ThemeContext.Provider value={value}>
+         {children}
+       </ThemeContext.Provider>
+     );
+   }
+   ```
+
+2. Updated `ThemeToggle.jsx` to handle client-side mounting:
+   ```jsx
+   export default function ThemeToggle() {
+     const { darkMode, toggleDarkMode, mounted } = useTheme();
+     
+     // Render a placeholder before client-side mount
+     if (!mounted) {
+       return <div className="w-9 h-9"></div>;
+     }
+     
+     return (
+       <button
+         onClick={toggleDarkMode}
+         className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition"
+         aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+       >
+         {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+       </button>
+     );
+   }
+   ```
+
+## Custom Fonts
+
+1. Updated `src/app/layout.js` to include Google Fonts:
+   ```jsx
+   import { Inter, Poppins } from 'next/font/google';
+
+   // Define fonts
+   const inter = Inter({
+     subsets: ['latin'],
+     display: 'swap',
+     variable: '--font-inter',
+   });
+
+   const poppins = Poppins({
+     weight: ['400', '500', '600', '700'],
+     subsets: ['latin'],
+     display: 'swap',
+     variable: '--font-poppins',
+   });
+
+   export default function RootLayout({ children }) {
+     return (
+       <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
+         <body>
+           <ThemeProvider>
+             {children}
+           </ThemeProvider>
+         </body>
+       </html>
+     );
+   }
+   ```
+
+2. Applied custom fonts to components:
+   ```jsx
+   <h1 className="font-heading text-4xl md:text-5xl font-extrabold mb-4">
+     Hi, I'm {personalInfo.name.split(' ')[0]}.<br />Learning to Code & Build
+   </h1>
+   ```
+
+## Personal Information
+
+1. Updated personal information in `src/data/personal.js`:
+   ```javascript
+   export const personalInfo = {
+     name: 'Tony Ye',
+     title: 'Frontend Developer Learner',
+     email: 'alei198634@gmail.com',
+     github: 'https://github.com/Tony1986111',
+     twitter: 'https://x.com/alei198634',
+     linkedin: 'https://www.linkedin.com/in/delai-ye-2551b092/',
+     website: 'https://tonyiscoding.xyz',
+     // Other personal information...
+   };
+   ```
+
+After completing these steps, you will have a well-styled website with proper theming, custom fonts, and animations.

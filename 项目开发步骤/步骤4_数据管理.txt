@@ -1,0 +1,378 @@
+# 步骤4：数据管理
+
+## 创建项目数据
+
+1. 在 `src/data` 目录下创建 `projects.js` 文件：
+   ```javascript
+   export const projects = [
+     {
+       id: 1,
+       title: '个人网站',
+       description: '使用Next.js和React构建的个人网站，展示我的项目和博客。',
+       emoji: '🌐',
+       status: '进行中',
+       tags: ['Next.js', 'React', 'Tailwind CSS'],
+       link: '/',
+       featured: true
+     },
+     {
+       id: 2,
+       title: '待办事项应用',
+       description: '一个简单的待办事项应用，使用React和localStorage存储数据。',
+       emoji: '📝',
+       status: '已完成',
+       tags: ['React', 'CSS', 'LocalStorage'],
+       link: 'https://github.com/你的用户名/todo-app',
+       featured: true
+     },
+     // 添加更多项目...
+   ];
+   
+   // 获取所有项目
+   export function getAllProjects() {
+     return projects;
+   }
+   
+   // 获取精选项目
+   export function getFeaturedProjects() {
+     return projects.filter(project => project.featured);
+   }
+   
+   // 根据ID获取项目
+   export function getProjectById(id) {
+     return projects.find(project => project.id === id);
+   }
+   ```
+
+## 创建博客数据
+
+1. 在 `src/data` 目录下创建 `blog.js` 文件：
+   ```javascript
+   export const posts = [
+     {
+       id: 1,
+       title: '我的编程学习之旅',
+       slug: 'my-programming-journey',
+       date: '2023-12-01',
+       excerpt: '分享我从零开始学习编程的经验和心得。',
+       content: `
+         # 我的编程学习之旅
+         
+         ## 起步
+         
+         我的编程学习之旅始于2023年初。作为一个完全的新手，我决定从HTML、CSS和JavaScript开始学起...
+         
+         ## 挑战与收获
+         
+         学习编程的过程中，我遇到了许多挑战...
+         
+         ## 未来计划
+         
+         接下来，我计划深入学习React和Next.js...
+       `,
+       tags: ['学习', '编程', '个人经历'],
+       featured: true
+     },
+     {
+       id: 2,
+       title: 'React基础入门',
+       slug: 'react-basics',
+       date: '2024-01-15',
+       excerpt: '介绍React的基本概念和使用方法。',
+       content: `
+         # React基础入门
+         
+         React是一个用于构建用户界面的JavaScript库。本文将介绍React的基本概念和使用方法...
+         
+         ## 组件
+         
+         React的核心概念是组件...
+         
+         ## 状态管理
+         
+         在React中，状态是组件的核心...
+       `,
+       tags: ['React', '前端', '教程'],
+       featured: true
+     },
+     // 添加更多博客文章...
+   ];
+   
+   // 获取所有博客文章
+   export function getAllPosts() {
+     return posts;
+   }
+   
+   // 获取精选博客文章
+   export function getFeaturedPosts() {
+     return posts.filter(post => post.featured);
+   }
+   
+   // 根据slug获取博客文章
+   export function getPostBySlug(slug) {
+     return posts.find(post => post.slug === slug);
+   }
+   ```
+
+## 创建技能数据
+
+1. 在 `src/data` 目录下创建 `skills.js` 文件：
+   ```javascript
+   export const skills = [
+     { name: 'HTML', level: '中级', icon: '🌐' },
+     { name: 'CSS', level: '中级', icon: '🎨' },
+     { name: 'JavaScript', level: '初级', icon: '🚀' },
+     { name: 'React', level: '初级', icon: '⚛️' },
+     { name: 'Next.js', level: '学习中', icon: '📱' },
+     { name: 'Git', level: '初级', icon: '📂' },
+     { name: 'Tailwind CSS', level: '初级', icon: '💨' },
+     { name: '你的专业背景', level: '专家', icon: '🧪' }
+   ];
+   
+   export function getAllSkills() {
+     return skills;
+   }
+   ```
+
+## 创建个人信息数据
+
+1. 在 `src/data` 目录下创建 `personal.js` 文件：
+   ```javascript
+   export const personalInfo = {
+     name: '你的名字',
+     title: '前端开发学习者',
+     email: 'your.email@example.com',
+     github: 'https://github.com/你的用户名',
+     twitter: 'https://twitter.com/你的用户名',
+     linkedin: 'https://linkedin.com/in/你的用户名',
+     bio: '我是一名正在转行到IT行业的学习者，目前专注于前端开发技术。',
+     longBio: `
+       我有着[你的原专业]背景，现在正在学习Web开发和编程。
+       
+       我对技术充满热情，并且相信通过持续学习和实践，我可以在IT行业取得成功。
+       
+       我的目标是成为一名全栈开发者，能够独立构建和部署Web应用。
+     `,
+     journey: [
+       {
+         period: '过去 - 2023',
+         title: '你的原专业/职业',
+         description: '描述你的原专业或职业经历。'
+       },
+       {
+         period: '2023',
+         title: '编程基础学习',
+         description: '开始学习Web开发基础，包括HTML、CSS和JavaScript。'
+       },
+       {
+         period: '2024 - 现在',
+         title: '前端框架学习',
+         description: '深入学习React和Next.js，构建个人项目。'
+       }
+     ]
+   };
+   
+   export function getPersonalInfo() {
+     return personalInfo;
+   }
+   ```
+
+## 在组件中使用数据
+
+1. 更新 `src/app/page.js` 以使用这些数据：
+   ```jsx
+   import Hero from '@/components/Hero';
+   import Journey from '@/components/Journey';
+   import Skills from '@/components/Skills';
+   import Projects from '@/components/Projects';
+   import Navbar from '@/components/Navbar';
+   import Footer from '@/components/Footer';
+   
+   import { getPersonalInfo } from '@/data/personal';
+   import { getAllSkills } from '@/data/skills';
+   import { getFeaturedProjects } from '@/data/projects';
+   import { getFeaturedPosts } from '@/data/blog';
+   
+   export default function Home() {
+     const personalInfo = getPersonalInfo();
+     const skills = getAllSkills();
+     const featuredProjects = getFeaturedProjects();
+     const featuredPosts = getFeaturedPosts();
+     
+     return (
+       <div>
+         <Navbar />
+         <main>
+           <Hero personalInfo={personalInfo} />
+           <Journey journey={personalInfo.journey} />
+           <Skills skills={skills} />
+           <Projects projects={featuredProjects} />
+           {/* 可以添加一个博客预览部分 */}
+         </main>
+         <Footer personalInfo={personalInfo} />
+       </div>
+     );
+   }
+   ```
+
+2. 更新 `src/app/projects/page.js` 以使用项目数据：
+   ```jsx
+   import Navbar from '@/components/Navbar';
+   import Footer from '@/components/Footer';
+   import ProjectCard from '@/components/ProjectCard';
+   
+   import { getAllProjects } from '@/data/projects';
+   import { getPersonalInfo } from '@/data/personal';
+   
+   export default function Projects() {
+     const projects = getAllProjects();
+     const personalInfo = getPersonalInfo();
+     
+     return (
+       <div>
+         <Navbar />
+         <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+           <h1 className="text-3xl font-bold mb-8">我的项目</h1>
+           <div className="grid md:grid-cols-2 gap-8">
+             {projects.map(project => (
+               <ProjectCard key={project.id} project={project} />
+             ))}
+           </div>
+         </main>
+         <Footer personalInfo={personalInfo} />
+       </div>
+     );
+   }
+   ```
+
+3. 更新 `src/app/blog/page.js` 以使用博客数据：
+   ```jsx
+   import Navbar from '@/components/Navbar';
+   import Footer from '@/components/Footer';
+   import BlogPostCard from '@/components/BlogPostCard';
+   
+   import { getAllPosts } from '@/data/blog';
+   import { getPersonalInfo } from '@/data/personal';
+   
+   export default function Blog() {
+     const posts = getAllPosts();
+     const personalInfo = getPersonalInfo();
+     
+     return (
+       <div>
+         <Navbar />
+         <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+           <h1 className="text-3xl font-bold mb-8">我的博客</h1>
+           <div className="grid md:grid-cols-2 gap-8">
+             {posts.map(post => (
+               <BlogPostCard key={post.id} post={post} />
+             ))}
+           </div>
+         </main>
+         <Footer personalInfo={personalInfo} />
+       </div>
+     );
+   }
+   ```
+
+## 创建博客文章详情页
+
+1. 创建 `src/app/blog/[slug]/page.js` 文件以显示博客文章详情：
+   ```jsx
+   import Navbar from '@/components/Navbar';
+   import Footer from '@/components/Footer';
+   
+   import { getPostBySlug, getAllPosts } from '@/data/blog';
+   import { getPersonalInfo } from '@/data/personal';
+   
+   // 生成静态路径
+   export async function generateStaticParams() {
+     const posts = getAllPosts();
+     
+     return posts.map((post) => ({
+       slug: post.slug,
+     }));
+   }
+   
+   export default function BlogPost({ params }) {
+     const { slug } = params;
+     const post = getPostBySlug(slug);
+     const personalInfo = getPersonalInfo();
+     
+     if (!post) {
+       return <div>文章不存在</div>;
+     }
+     
+     return (
+       <div>
+         <Navbar />
+         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+           <article>
+             <header className="mb-8">
+               <div className="flex flex-wrap gap-2 mb-4">
+                 {post.tags.map((tag) => (
+                   <span key={tag} className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800">
+                     {tag}
+                   </span>
+                 ))}
+               </div>
+               <h1 className="text-4xl font-bold mb-2">{post.title}</h1>
+               <div className="text-gray-500 dark:text-gray-400">{post.date}</div>
+             </header>
+             
+             <div className="prose dark:prose-invert max-w-none">
+               {/* 这里需要一个Markdown渲染器 */}
+               <div dangerouslySetInnerHTML={{ __html: post.content }} />
+             </div>
+           </article>
+         </main>
+         <Footer personalInfo={personalInfo} />
+       </div>
+     );
+   }
+   ```
+
+2. 为了正确渲染Markdown内容，你需要安装和配置Markdown处理库：
+   ```bash
+   npm install remark remark-html
+   ```
+
+3. 创建 `src/lib/markdown.js` 文件：
+   ```javascript
+   import { remark } from 'remark';
+   import html from 'remark-html';
+   
+   export async function markdownToHtml(markdown) {
+     const result = await remark().use(html).process(markdown);
+     return result.toString();
+   }
+   ```
+
+4. 更新博客文章详情页以使用这个函数：
+   ```jsx
+   import { markdownToHtml } from '@/lib/markdown';
+   
+   export default async function BlogPost({ params }) {
+     const { slug } = params;
+     const post = getPostBySlug(slug);
+     const personalInfo = getPersonalInfo();
+     
+     if (!post) {
+       return <div>文章不存在</div>;
+     }
+     
+     const content = await markdownToHtml(post.content);
+     
+     return (
+       <div>
+         {/* ... */}
+         <div className="prose dark:prose-invert max-w-none">
+           <div dangerouslySetInnerHTML={{ __html: content }} />
+         </div>
+         {/* ... */}
+       </div>
+     );
+   }
+   ```
+
+完成这些步骤后，你将拥有一个基于数据驱动的个人网站，可以轻松地添加和更新项目、博客文章和个人信息。

@@ -1,0 +1,202 @@
+# Step 7: SEO Optimization
+
+/*
+Completed work:
+1. Added comprehensive metadata to the website
+2. Created structured data for better search engine understanding
+3. Added robots.txt file for crawler instructions
+4. Generated sitemap.xml for search engine indexing
+5. Implemented OpenGraph and Twitter card metadata for social sharing
+6. Created a centralized metadata management system
+*/
+
+## Comprehensive Metadata
+
+1. Updated `src/app/layout.js` with detailed metadata:
+   ```javascript
+   export const metadata = {
+     title: 'Tony Ye | Frontend Developer & IT Enthusiast',
+     description: 'Personal website of Tony Ye, showcasing frontend development projects, coding journey, and technical blog posts.',
+     keywords: ['frontend developer', 'web development', 'React', 'Next.js', 'portfolio', 'blog'],
+     authors: [{ name: 'Tony Ye', url: 'https://tonyiscoding.xyz' }],
+     creator: 'Tony Ye',
+     publisher: 'Tony Ye',
+     openGraph: {
+       title: 'Tony Ye | Frontend Developer & IT Enthusiast',
+       description: 'Personal website of Tony Ye, showcasing frontend development projects, coding journey, and technical blog posts.',
+       url: 'https://tonyiscoding.xyz',
+       siteName: 'Tony Ye',
+       locale: 'en_US',
+       type: 'website',
+     },
+     twitter: {
+       card: 'summary_large_image',
+       title: 'Tony Ye | Frontend Developer & IT Enthusiast',
+       description: 'Personal website of Tony Ye, showcasing frontend development projects, coding journey, and technical blog posts.',
+       creator: '@alei198634',
+     },
+     robots: {
+       index: true,
+       follow: true,
+     },
+   }
+   ```
+
+## Centralized Metadata Management
+
+1. Created `src/app/metadata.js` for centralized metadata management:
+   ```javascript
+   // Common metadata for the website
+   export const siteMetadata = {
+     title: {
+       default: 'Tony Ye | Frontend Developer & IT Enthusiast',
+       template: '%s | Tony Ye'
+     },
+     description: 'Personal website of Tony Ye, showcasing frontend development projects, coding journey, and technical blog posts.',
+     keywords: ['frontend developer', 'web development', 'React', 'Next.js', 'portfolio', 'blog'],
+     authors: [{ name: 'Tony Ye', url: 'https://tonyiscoding.xyz' }],
+     creator: 'Tony Ye',
+     publisher: 'Tony Ye',
+     url: 'https://tonyiscoding.xyz',
+     siteName: 'Tony Ye',
+     locale: 'en_US',
+     type: 'website',
+     twitterHandle: '@alei198634',
+   };
+
+   // Generate metadata for different pages
+   export function generateMetadata(title, description) {
+     return {
+       title: title || siteMetadata.title.default,
+       description: description || siteMetadata.description,
+       keywords: siteMetadata.keywords,
+       authors: siteMetadata.authors,
+       creator: siteMetadata.creator,
+       publisher: siteMetadata.publisher,
+       openGraph: {
+         title: title || siteMetadata.title.default,
+         description: description || siteMetadata.description,
+         url: siteMetadata.url,
+         siteName: siteMetadata.siteName,
+         locale: siteMetadata.locale,
+         type: siteMetadata.type,
+       },
+       twitter: {
+         card: 'summary_large_image',
+         title: title || siteMetadata.title.default,
+         description: description || siteMetadata.description,
+         creator: siteMetadata.twitterHandle,
+       },
+       robots: {
+         index: true,
+         follow: true,
+       },
+     };
+   }
+   ```
+
+## Structured Data
+
+1. Created `src/components/StructuredData.jsx` for JSON-LD structured data:
+   ```jsx
+   'use client';
+
+   import { getPersonalInfo } from '@/data/personal';
+
+   export default function StructuredData() {
+     const personalInfo = getPersonalInfo();
+     
+     // Person schema
+     const personSchema = {
+       '@context': 'https://schema.org',
+       '@type': 'Person',
+       name: personalInfo.name,
+       url: personalInfo.website,
+       sameAs: [
+         personalInfo.github,
+         personalInfo.twitter,
+         personalInfo.linkedin
+       ],
+       jobTitle: personalInfo.title,
+       description: personalInfo.bio
+     };
+     
+     // Website schema
+     const websiteSchema = {
+       '@context': 'https://schema.org',
+       '@type': 'WebSite',
+       name: `${personalInfo.name} | Personal Website`,
+       url: personalInfo.website,
+       description: 'Personal website showcasing projects and blog posts',
+       author: {
+         '@type': 'Person',
+         name: personalInfo.name
+       }
+     };
+     
+     return (
+       <>
+         <script
+           type="application/ld+json"
+           dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+         />
+         <script
+           type="application/ld+json"
+           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+         />
+       </>
+     );
+   }
+   ```
+
+2. Added structured data to the layout:
+   ```jsx
+   return (
+     <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
+       <head>
+         <StructuredData />
+       </head>
+       <body>
+         <ThemeProvider>
+           {children}
+         </ThemeProvider>
+       </body>
+     </html>
+   )
+   ```
+
+## Robots.txt
+
+1. Created `public/robots.txt` for search engine crawlers:
+   ```
+   # Allow all web crawlers
+   User-agent: *
+   Allow: /
+
+   # Sitemap location
+   Sitemap: https://tonyiscoding.xyz/sitemap.xml
+   ```
+
+## Sitemap
+
+1. Created `src/app/sitemap.js` for dynamic sitemap generation:
+   ```javascript
+   export default function sitemap() {
+     const baseUrl = 'https://tonyiscoding.xyz';
+     
+     // Define all routes
+     const routes = [
+       '',
+       '/projects',
+       '/blog',
+       '/contact',
+     ].map((route) => ({
+       url: `${baseUrl}${route}`,
+       lastModified: new Date().toISOString(),
+     }));
+     
+     return routes;
+   }
+   ```
+
+After completing these steps, your website will be well-optimized for search engines, with proper metadata, structured data, and crawler instructions.

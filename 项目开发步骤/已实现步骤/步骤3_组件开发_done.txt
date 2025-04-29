@@ -1,0 +1,317 @@
+# Step 3: Component Development
+
+/*
+Completed work:
+1. Updated all components to use ThemeContext instead of local state
+2. Created ThemeToggle component for dark mode switching
+3. Updated Navbar component to use ThemeToggle
+4. Converted all text content to English
+5. Ensured consistent styling across components
+6. Improved component reusability
+*/
+
+## Creating Navigation Bar Component
+
+1. Created `src/components/Navbar.jsx`:
+   ```jsx
+   'use client';
+   
+   import { useState } from 'react';
+   import Link from 'next/link';
+   import { Menu, X } from 'lucide-react';
+   import { useTheme } from '@/context/ThemeContext';
+   import ThemeToggle from './ThemeToggle';
+   
+   export default function Navbar() {
+     const { darkMode } = useTheme();
+     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+     
+     const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+     
+     return (
+       <nav className={`fixed w-full z-10 ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'} border-b ${darkMode ? 'border-gray-800' : 'border-gray-200'}`}>
+         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+           <div className="flex justify-between h-16">
+             <div className="flex items-center">
+               <Link href="/" className="text-xl font-bold">TONY.TECH</Link>
+             </div>
+             
+             <div className="hidden md:flex items-center space-x-8">
+               <Link href="/" className="hover:text-blue-500 transition">Home</Link>
+               <Link href="/projects" className="hover:text-blue-500 transition">Projects</Link>
+               <Link href="/blog" className="hover:text-blue-500 transition">Blog</Link>
+               <Link href="/contact" className="hover:text-blue-500 transition">Contact</Link>
+               <ThemeToggle />
+             </div>
+             
+             <div className="md:hidden flex items-center">
+               <div className="mr-2">
+                 <ThemeToggle />
+               </div>
+               <button onClick={toggleMobileMenu} className="p-2 rounded-full hover:bg-gray-800 transition">
+                 {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+               </button>
+             </div>
+           </div>
+         </div>
+         
+         {/* Mobile menu */}
+         {mobileMenuOpen && (
+           <div className={`md:hidden ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+               <Link href="/" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800 transition">Home</Link>
+               <Link href="/projects" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800 transition">Projects</Link>
+               <Link href="/blog" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800 transition">Blog</Link>
+               <Link href="/contact" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800 transition">Contact</Link>
+             </div>
+           </div>
+         )}
+       </nav>
+     );
+   }
+   ```
+
+## Creating Footer Component
+
+1. Created `src/components/Footer.jsx`:
+   ```jsx
+   'use client';
+   
+   import { Github, Linkedin, Twitter, Mail } from 'lucide-react';
+   import { useTheme } from '@/context/ThemeContext';
+   
+   export default function Footer() {
+     const { darkMode } = useTheme();
+     
+     return (
+       <footer className={`${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'} py-12`}>
+         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+           <div className="flex flex-col md:flex-row justify-between items-center">
+             <div className="mb-4 md:mb-0">
+               <span className="font-bold text-xl">TONY.TECH</span>
+               <p className="mt-2">From coding novice to full-stack developer.</p>
+             </div>
+             
+             <div className="flex space-x-4">
+               <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-gray-700 transition">
+                 <Github size={20} />
+               </a>
+               <a href="https://twitter.com/yourusername" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-gray-700 transition">
+                 <Twitter size={20} />
+               </a>
+               <a href="https://linkedin.com/in/yourusername" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-gray-700 transition">
+                 <Linkedin size={20} />
+               </a>
+               <a href="mailto:your.email@example.com" className="p-2 rounded-full hover:bg-gray-700 transition">
+                 <Mail size={20} />
+               </a>
+             </div>
+           </div>
+           
+           <div className={`mt-8 pt-8 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'} text-center`}>
+             <p>&copy; {new Date().getFullYear()} Tony Wang. All rights reserved.</p>
+           </div>
+         </div>
+       </footer>
+     );
+   }
+   ```
+
+## Creating Hero Section Component
+
+1. Created `src/components/Hero.jsx`:
+   ```jsx
+   'use client';
+   
+   import Link from 'next/link';
+   import { useTheme } from '@/context/ThemeContext';
+   
+   export default function Hero() {
+     const { darkMode } = useTheme();
+     
+     return (
+       <div className="pt-32 pb-16">
+         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+           <div className="md:flex items-center">
+             <div className="md:w-2/3 md:pr-8">
+               <div className={`inline-block px-3 py-1 rounded-md text-sm font-medium mb-4 ${darkMode ? 'bg-blue-900 text-blue-100' : 'bg-blue-100 text-blue-800'}`}>
+                 IT Enthusiast → Full Stack Developer
+               </div>
+               <h1 className="text-4xl md:text-5xl font-extrabold mb-4">Hi, I'm Tony.<br />Learning to Code & Build</h1>
+               <p className="text-xl md:text-2xl mb-8 opacity-80">I'm learning web development technologies, exploring React, Next.js, and full-stack development.</p>
+               <div className="flex space-x-4">
+                 <Link href="/projects" className={`px-6 py-3 rounded-lg ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white font-medium transition`}>My Projects</Link>
+                 <Link href="/blog" className={`px-6 py-3 rounded-lg ${darkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-200 hover:bg-gray-300'} font-medium transition`}>My Blog</Link>
+               </div>
+             </div>
+             <div className="md:w-1/3 mt-8 md:mt-0 flex justify-center">
+               <div className={`w-48 h-48 rounded-full ${darkMode ? 'bg-gray-800' : 'bg-gray-200'} flex items-center justify-center overflow-hidden`}>
+                 {/* You can place your profile picture here */}
+                 <span className="text-6xl">👨‍💻</span>
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+     );
+   }
+   ```
+
+## Creating Project Card Component
+
+1. Created `src/components/ProjectCard.jsx`:
+   ```jsx
+   'use client';
+   
+   import Link from 'next/link';
+   import { useTheme } from '@/context/ThemeContext';
+   
+   export default function ProjectCard({ project }) {
+     const { darkMode } = useTheme();
+     
+     return (
+       <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl overflow-hidden shadow-lg transition hover:scale-[1.02]`}>
+         <div className={`h-48 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} flex items-center justify-center`}>
+           <span className="text-5xl">{project.emoji}</span>
+         </div>
+         <div className="p-6">
+           <div className="flex justify-between items-center mb-2">
+             <h3 className="text-xl font-bold">{project.title}</h3>
+             <div className={`px-2 py-1 text-xs rounded-full ${darkMode ? 'bg-blue-900 text-blue-100' : 'bg-blue-100 text-blue-800'}`}>
+               {project.status}
+             </div>
+           </div>
+           <p className={`mb-4 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{project.description}</p>
+           <div className="flex flex-wrap gap-2">
+             {project.tags.map((tag) => (
+               <span key={tag} className={`px-2 py-1 text-xs rounded ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                 {tag}
+               </span>
+             ))}
+           </div>
+           {project.link && (
+             <div className="mt-4">
+               <Link href={project.link} className={`inline-block px-3 py-1 rounded ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}>
+                 View Project
+               </Link>
+             </div>
+           )}
+         </div>
+       </div>
+     );
+   }
+   ```
+
+## Creating Blog Post Card Component
+
+1. Created `src/components/BlogPostCard.jsx`:
+   ```jsx
+   'use client';
+   
+   import Link from 'next/link';
+   import { useTheme } from '@/context/ThemeContext';
+   
+   export default function BlogPostCard({ post }) {
+     const { darkMode } = useTheme();
+     
+     return (
+       <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl overflow-hidden shadow-lg transition hover:scale-[1.02]`}>
+         <div className="p-6">
+           <div className="flex justify-between items-center mb-2">
+             <h3 className="text-xl font-bold">{post.title}</h3>
+             <div className={`px-2 py-1 text-xs rounded-full ${darkMode ? 'bg-blue-900 text-blue-100' : 'bg-blue-100 text-blue-800'}`}>
+               {post.date}
+             </div>
+           </div>
+           <p className={`mb-4 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{post.excerpt}</p>
+           <div className="flex flex-wrap gap-2 mb-4">
+             {post.tags.map((tag) => (
+               <span key={tag} className={`px-2 py-1 text-xs rounded ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                 {tag}
+               </span>
+             ))}
+           </div>
+           <Link href={`/blog/${post.slug}`} className={`inline-block px-3 py-1 rounded ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}>
+             Read More
+           </Link>
+         </div>
+       </div>
+     );
+   }
+   ```
+
+## Creating Theme Toggle Component
+
+1. Created `src/components/ThemeToggle.jsx`:
+   ```jsx
+   'use client';
+   
+   import { useTheme } from '@/context/ThemeContext';
+   import { Moon, Sun } from 'lucide-react';
+   
+   export default function ThemeToggle() {
+     const { darkMode, toggleDarkMode } = useTheme();
+     
+     return (
+       <button
+         onClick={toggleDarkMode}
+         className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition"
+         aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+       >
+         {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+       </button>
+     );
+   }
+   ```
+
+## Creating Dark Mode Context
+
+1. Created `src/context/ThemeContext.jsx`:
+   ```jsx
+   'use client';
+   
+   import { createContext, useState, useContext, useEffect } from 'react';
+   
+   const ThemeContext = createContext();
+   
+   export function ThemeProvider({ children }) {
+     const [darkMode, setDarkMode] = useState(true);
+     
+     // Check user's previous preference
+     useEffect(() => {
+       const savedTheme = localStorage.getItem('theme');
+       if (savedTheme) {
+         setDarkMode(savedTheme === 'dark');
+       } else {
+         // Check system preference
+         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+         setDarkMode(prefersDark);
+       }
+     }, []);
+     
+     // Save user preference
+     useEffect(() => {
+       localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+       // Update HTML element class to apply global styles
+       if (darkMode) {
+         document.documentElement.classList.add('dark');
+       } else {
+         document.documentElement.classList.remove('dark');
+       }
+     }, [darkMode]);
+     
+     const toggleDarkMode = () => setDarkMode(!darkMode);
+     
+     return (
+       <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>
+         {children}
+       </ThemeContext.Provider>
+     );
+   }
+   
+   export function useTheme() {
+     return useContext(ThemeContext);
+   }
+   ```
+
+After completing these steps, you will have a set of reusable components with dark mode support that can be used throughout your website.

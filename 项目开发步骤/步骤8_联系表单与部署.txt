@@ -1,0 +1,547 @@
+# 步骤8：联系表单与部署
+
+## 创建联系表单
+
+1. 更新 `src/app/contact/page.js` 文件：
+   ```jsx
+   'use client';
+   
+   import { useState } from 'react';
+   import Navbar from '@/components/Navbar';
+   import Footer from '@/components/Footer';
+   import PageTransition from '@/components/PageTransition';
+   import { Send, Mail, Github, Linkedin, Twitter } from 'lucide-react';
+   
+   export default function Contact() {
+     const [formData, setFormData] = useState({
+       name: '',
+       email: '',
+       subject: '',
+       message: ''
+     });
+     
+     const [status, setStatus] = useState({
+       submitted: false,
+       submitting: false,
+       info: { error: false, msg: null }
+     });
+     
+     const handleChange = (e) => {
+       setFormData({
+         ...formData,
+         [e.target.name]: e.target.value
+       });
+     };
+     
+     const handleSubmit = async (e) => {
+       e.preventDefault();
+       setStatus(prevStatus => ({ ...prevStatus, submitting: true }));
+       
+       try {
+         const res = await fetch('/api/contact', {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/json'
+           },
+           body: JSON.stringify(formData)
+         });
+         
+         const data = await res.json();
+         
+         if (res.status === 200) {
+           setStatus({
+             submitted: true,
+             submitting: false,
+             info: { error: false, msg: data.message }
+           });
+           setFormData({
+             name: '',
+             email: '',
+             subject: '',
+             message: ''
+           });
+         } else {
+           setStatus({
+             submitted: false,
+             submitting: false,
+             info: { error: true, msg: data.message }
+           });
+         }
+       } catch (error) {
+         setStatus({
+           submitted: false,
+           submitting: false,
+           info: { error: true, msg: '发送失败，请稍后再试' }
+         });
+       }
+     };
+     
+     return (
+       <div className="min-h-screen flex flex-col">
+         <Navbar />
+         <PageTransition>
+           <main className="flex-grow max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+             <h1 className="text-3xl font-bold mb-8">联系我</h1>
+             
+             <div className="md:flex md:gap-12">
+               <div className="md:w-1/2 mb-8 md:mb-0">
+                 <h2 className="text-xl font-semibold mb-4">发送消息</h2>
+                 
+                 <form onSubmit={handleSubmit} className="space-y-4">
+                   <div>
+                     <label htmlFor="name" className="block mb-1">姓名</label>
+                     <input
+                       type="text"
+                       id="name"
+                       name="name"
+                       value={formData.name}
+                       onChange={handleChange}
+                       required
+                       className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     />
+                   </div>
+                   
+                   <div>
+                     <label htmlFor="email" className="block mb-1">邮箱</label>
+                     <input
+                       type="email"
+                       id="email"
+                       name="email"
+                       value={formData.email}
+                       onChange={handleChange}
+                       required
+                       className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     />
+                   </div>
+                   
+                   <div>
+                     <label htmlFor="subject" className="block mb-1">主题</label>
+                     <input
+                       type="text"
+                       id="subject"
+                       name="subject"
+                       value={formData.subject}
+                       onChange={handleChange}
+                       required
+                       className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     />
+                   </div>
+                   
+                   <div>
+                     <label htmlFor="message" className="block mb-1">消息</label>
+                     <textarea
+                       id="message"
+                       name="message"
+                       value={formData.message}
+                       onChange={handleChange}
+                       required
+                       rows="5"
+                       className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     ></textarea>
+                   </div>
+                   
+                   <button
+                     type="submit"
+                     disabled={status.submitting}
+                     className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition disabled:opacity-50"
+                   >
+                     {status.submitting ? '发送中...' : (
+                       <>
+                         <Send size={18} />
+                         <span>发送消息</span>
+                       </>
+                     )}
+                   </button>
+                   
+                   {status.info.error && (
+                     <div className="p-3 bg-red-100 text-red-700 rounded-lg">
+                       {status.info.msg}
+                     </div>
+                   )}
+                   
+                   {status.submitted && (
+                     <div className="p-3 bg-green-100 text-green-700 rounded-lg">
+                       {status.info.msg}
+                     </div>
+                   )}
+                 </form>
+               </div>
+               
+               <div className="md:w-1/2">
+                 <h2 className="text-xl font-semibold mb-4">其他联系方式</h2>
+                 
+                 <div className="space-y-4">
+                   <div className="flex items-center gap-3">
+                     <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-500">
+                       <Mail size={20} />
+                     </div>
+                     <div>
+                       <div className="font-medium">邮箱</div>
+                       <a href="mailto:your.email@example.com" className="text-blue-500 hover:underline">
+                         your.email@example.com
+                       </a>
+                     </div>
+                   </div>
+                   
+                   <div className="flex items-center gap-3">
+                     <div className="p-3 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                       <Github size={20} />
+                     </div>
+                     <div>
+                       <div className="font-medium">GitHub</div>
+                       <a href="https://github.com/你的用户名" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                         github.com/你的用户名
+                       </a>
+                     </div>
+                   </div>
+                   
+                   <div className="flex items-center gap-3">
+                     <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-500">
+                       <Linkedin size={20} />
+                     </div>
+                     <div>
+                       <div className="font-medium">LinkedIn</div>
+                       <a href="https://linkedin.com/in/你的用户名" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                         linkedin.com/in/你的用户名
+                       </a>
+                     </div>
+                   </div>
+                   
+                   <div className="flex items-center gap-3">
+                     <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-500">
+                       <Twitter size={20} />
+                     </div>
+                     <div>
+                       <div className="font-medium">Twitter</div>
+                       <a href="https://twitter.com/你的用户名" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                         twitter.com/你的用户名
+                       </a>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </main>
+         </PageTransition>
+         <Footer />
+       </div>
+     );
+   }
+   ```
+
+2. 创建联系表单API处理程序。创建 `src/app/api/contact/route.js` 文件：
+   ```javascript
+   import { NextResponse } from 'next/server';
+   
+   export async function POST(request) {
+     const data = await request.json();
+     const { name, email, subject, message } = data;
+     
+     // 验证表单数据
+     if (!name || !email || !subject || !message) {
+       return NextResponse.json(
+         { message: '请填写所有必填字段' },
+         { status: 400 }
+       );
+     }
+     
+     try {
+       // 这里你可以添加发送邮件的逻辑
+       // 例如使用 nodemailer 或其他邮件服务
+       
+       // 示例：记录到控制台（在实际应用中，你会发送邮件）
+       console.log('收到联系表单提交:');
+       console.log({ name, email, subject, message });
+       
+       // 如果你想使用第三方服务如 SendGrid、Mailchimp 等，你需要在这里添加相应的代码
+       
+       return NextResponse.json(
+         { message: '消息已发送，感谢您的联系！' },
+         { status: 200 }
+       );
+     } catch (error) {
+       console.error('发送邮件失败:', error);
+       return NextResponse.json(
+         { message: '发送失败，请稍后再试' },
+         { status: 500 }
+       );
+     }
+   }
+   ```
+
+3. 如果你想使用真实的邮件发送功能，可以安装 Nodemailer 并配置：
+   ```bash
+   npm install nodemailer
+   ```
+
+4. 创建 `src/lib/email.js` 文件：
+   ```javascript
+   import nodemailer from 'nodemailer';
+   
+   export async function sendEmail({ name, email, subject, message }) {
+     const transporter = nodemailer.createTransport({
+       host: process.env.EMAIL_SERVER_HOST,
+       port: process.env.EMAIL_SERVER_PORT,
+       secure: true,
+       auth: {
+         user: process.env.EMAIL_SERVER_USER,
+         pass: process.env.EMAIL_SERVER_PASSWORD,
+       },
+     });
+     
+     const mailOptions = {
+       from: process.env.EMAIL_FROM,
+       to: process.env.EMAIL_TO,
+       subject: `网站联系表单: ${subject}`,
+       replyTo: email,
+       text: `
+         姓名: ${name}
+         邮箱: ${email}
+         
+         消息:
+         ${message}
+       `,
+       html: `
+         <div>
+           <p><strong>姓名:</strong> ${name}</p>
+           <p><strong>邮箱:</strong> ${email}</p>
+           <p><strong>主题:</strong> ${subject}</p>
+           <p><strong>消息:</strong></p>
+           <p>${message.replace(/\n/g, '<br>')}</p>
+         </div>
+       `,
+     };
+     
+     return transporter.sendMail(mailOptions);
+   }
+   ```
+
+5. 更新 `src/app/api/contact/route.js` 以使用邮件发送功能：
+   ```javascript
+   import { NextResponse } from 'next/server';
+   import { sendEmail } from '@/lib/email';
+   
+   export async function POST(request) {
+     const data = await request.json();
+     const { name, email, subject, message } = data;
+     
+     // 验证表单数据
+     if (!name || !email || !subject || !message) {
+       return NextResponse.json(
+         { message: '请填写所有必填字段' },
+         { status: 400 }
+       );
+     }
+     
+     try {
+       await sendEmail({ name, email, subject, message });
+       
+       return NextResponse.json(
+         { message: '消息已发送，感谢您的联系！' },
+         { status: 200 }
+       );
+     } catch (error) {
+       console.error('发送邮件失败:', error);
+       return NextResponse.json(
+         { message: '发送失败，请稍后再试' },
+         { status: 500 }
+       );
+     }
+   }
+   ```
+
+## 准备部署
+
+1. 创建 `.env.local` 文件（不要提交到版本控制）：
+   ```
+   # 邮件服务器配置
+   EMAIL_SERVER_HOST=smtp.example.com
+   EMAIL_SERVER_PORT=465
+   EMAIL_SERVER_USER=your-email@example.com
+   EMAIL_SERVER_PASSWORD=your-password
+   EMAIL_FROM=your-email@example.com
+   EMAIL_TO=your-email@example.com
+   
+   # 其他环境变量
+   NEXT_PUBLIC_SITE_URL=https://你的域名.com
+   ```
+
+2. 创建 `.env.example` 文件（可以提交到版本控制）：
+   ```
+   # 邮件服务器配置
+   EMAIL_SERVER_HOST=smtp.example.com
+   EMAIL_SERVER_PORT=465
+   EMAIL_SERVER_USER=your-email@example.com
+   EMAIL_SERVER_PASSWORD=your-password
+   EMAIL_FROM=your-email@example.com
+   EMAIL_TO=your-email@example.com
+   
+   # 其他环境变量
+   NEXT_PUBLIC_SITE_URL=https://你的域名.com
+   ```
+
+3. 更新 `.gitignore` 文件：
+   ```
+   # 依赖
+   node_modules
+   
+   # Next.js
+   .next/
+   out/
+   
+   # 生产环境
+   build
+   
+   # 其他
+   .DS_Store
+   *.pem
+   
+   # 调试
+   npm-debug.log*
+   yarn-debug.log*
+   yarn-error.log*
+   
+   # 本地环境文件
+   .env*.local
+   
+   # Vercel
+   .vercel
+   
+   # TypeScript
+   *.tsbuildinfo
+   next-env.d.ts
+   ```
+
+4. 创建 `next.config.js` 文件：
+   ```javascript
+   /** @type {import('next').NextConfig} */
+   const nextConfig = {
+     images: {
+       domains: ['你的图片域名.com'], // 如果你使用外部图片服务
+     },
+     // 其他配置...
+   };
+   
+   module.exports = nextConfig;
+   ```
+
+5. 创建 `robots.txt` 文件在 `public` 目录下：
+   ```
+   User-agent: *
+   Allow: /
+   
+   Sitemap: https://你的域名.com/sitemap.xml
+   ```
+
+6. 创建 `sitemap.xml` 文件在 `public` 目录下：
+   ```xml
+   <?xml version="1.0" encoding="UTF-8"?>
+   <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+     <url>
+       <loc>https://你的域名.com/</loc>
+       <lastmod>2024-01-01</lastmod>
+       <changefreq>monthly</changefreq>
+       <priority>1.0</priority>
+     </url>
+     <url>
+       <loc>https://你的域名.com/projects</loc>
+       <lastmod>2024-01-01</lastmod>
+       <changefreq>weekly</changefreq>
+       <priority>0.8</priority>
+     </url>
+     <url>
+       <loc>https://你的域名.com/blog</loc>
+       <lastmod>2024-01-01</lastmod>
+       <changefreq>weekly</changefreq>
+       <priority>0.8</priority>
+     </url>
+     <url>
+       <loc>https://你的域名.com/contact</loc>
+       <lastmod>2024-01-01</lastmod>
+       <changefreq>monthly</changefreq>
+       <priority>0.7</priority>
+     </url>
+     <!-- 添加更多URL... -->
+   </urlset>
+   ```
+
+## 部署到Vercel
+
+1. 创建 `vercel.json` 文件：
+   ```json
+   {
+     "version": 2,
+     "buildCommand": "npm run build",
+     "devCommand": "npm run dev",
+     "installCommand": "npm install",
+     "framework": "nextjs",
+     "outputDirectory": ".next"
+   }
+   ```
+
+2. 部署步骤：
+   - 创建一个GitHub仓库并推送你的代码
+   - 注册Vercel账号：https://vercel.com
+   - 在Vercel中导入你的GitHub仓库
+   - 配置环境变量（从`.env.local`复制）
+   - 点击部署
+
+3. 部署后的操作：
+   - 设置自定义域名（如果有）
+   - 配置SSL证书（Vercel自动处理）
+   - 测试网站功能
+
+## 部署到其他平台
+
+### Netlify
+
+1. 创建 `netlify.toml` 文件：
+   ```toml
+   [build]
+     command = "npm run build"
+     publish = ".next"
+   
+   [[plugins]]
+     package = "@netlify/plugin-nextjs"
+   ```
+
+2. 部署步骤：
+   - 注册Netlify账号：https://netlify.com
+   - 在Netlify中导入你的GitHub仓库
+   - 配置环境变量
+   - 点击部署
+
+### 自托管（VPS）
+
+1. 使用PM2管理Node.js应用：
+   ```bash
+   npm install -g pm2
+   ```
+
+2. 创建 `ecosystem.config.js` 文件：
+   ```javascript
+   module.exports = {
+     apps: [
+       {
+         name: 'personal-website',
+         script: 'node_modules/next/dist/bin/next',
+         args: 'start',
+         instances: 'max',
+         exec_mode: 'cluster',
+         env: {
+           NODE_ENV: 'production',
+           PORT: 3000
+         }
+       }
+     ]
+   };
+   ```
+
+3. 部署步骤：
+   - 在服务器上克隆仓库
+   - 安装依赖：`npm install`
+   - 构建应用：`npm run build`
+   - 启动应用：`pm2 start ecosystem.config.js`
+   - 配置Nginx作为反向代理
+
+完成这些步骤后，你的个人网站将拥有一个功能完善的联系表单，并且已经准备好部署到生产环境。

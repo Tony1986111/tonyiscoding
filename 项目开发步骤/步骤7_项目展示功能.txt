@@ -1,0 +1,637 @@
+# 步骤7：项目展示功能
+
+## 创建项目数据结构
+
+1. 在 `src/data/projects` 目录下创建项目数据文件：
+   ```bash
+   mkdir -p src/data/projects
+   ```
+
+2. 创建 `src/data/projects/index.js` 文件，用于导出所有项目数据：
+   ```javascript
+   import fs from 'fs';
+   import path from 'path';
+   import matter from 'gray-matter';
+
+   const projectsDirectory = path.join(process.cwd(), 'src/data/projects');
+
+   export function getSortedProjectsData() {
+     // 获取 /projects 目录下的所有文件名
+     const fileNames = fs.readdirSync(projectsDirectory).filter(fileName => 
+       fileName.endsWith('.md') || fileName.endsWith('.mdx')
+     );
+     
+     const allProjectsData = fileNames.map((fileName) => {
+       // 移除文件名中的扩展名以获取 id
+       const id = fileName.replace(/\.(md|mdx)$/, '');
+
+       // 将 markdown 文件读取为字符串
+       const fullPath = path.join(projectsDirectory, fileName);
+       const fileContents = fs.readFileSync(fullPath, 'utf8');
+
+       // 使用 gray-matter 解析 markdown 文件的元数据部分
+       const matterResult = matter(fileContents);
+
+       // 将数据与 id 组合
+       return {
+         id,
+         ...matterResult.data,
+       };
+     });
+
+     // 按日期排序（最新的在前）
+     return allProjectsData.sort((a, b) => {
+       if (a.date < b.date) {
+         return 1;
+       } else {
+         return -1;
+       }
+     });
+   }
+
+   export function getAllProjectIds() {
+     const fileNames = fs.readdirSync(projectsDirectory).filter(fileName => 
+       fileName.endsWith('.md') || fileName.endsWith('.mdx')
+     );
+     
+     return fileNames.map((fileName) => {
+       return {
+         params: {
+           id: fileName.replace(/\.(md|mdx)$/, ''),
+         },
+       };
+     });
+   }
+
+   export async function getProjectData(id) {
+     let fullPath = path.join(projectsDirectory, `${id}.md`);
+     
+     // 检查 .md 文件是否存在，如果不存在则尝试 .mdx
+     if (!fs.existsSync(fullPath)) {
+       fullPath = path.join(projectsDirectory, `${id}.mdx`);
+     }
+     
+     const fileContents = fs.readFileSync(fullPath, 'utf8');
+
+     // 使用 gray-matter 解析 markdown 文件的元数据部分
+     const matterResult = matter(fileContents);
+
+     // 将数据与 id 和内容组合
+     return {
+       id,
+       content: matterResult.content,
+       ...matterResult.data,
+     };
+   }
+
+   export function getFeaturedProjects() {
+     const allProjects = getSortedProjectsData();
+     return allProjects.filter(project => project.featured);
+   }
+   ```
+
+3. 创建一个示例项目文件 `src/data/projects/personal-website.md`：
+   ```markdown
+   ---
+   title: '个人网站'
+   date: '2024-06-01'
+   description: '使用Next.js和React构建的个人网站，展示我的项目和博客。'
+   emoji: '🌐'
+   status: '进行中'
+   tags: ['Next.js', 'React', 'Tailwind CSS']
+   featured: true
+   github: 'https://github.com/你的用户名/personal-website'
+   demo: 'https://你的域名.com'
+   ---
+
+   # 个人网站项目
+
+   这是我使用Next.js和React构建的个人网站，用于展示我的项目和博客。
+
+   ## 技术栈
+
+   - Next.js
+   - React
+   - Tailwind CSS
+   - Markdown
+
+   ## 功能特点
+
+   - 响应式设计
+   - 暗黑模式
+   - 博客系统
+   - 项目展示
+   - 联系表单
+
+   ## 开发过程
+
+   这个网站的开发过程是我学习React和Next.js的一个重要部分。我从设计开始，然后逐步实现各个功能...
+
+   ## 遇到的挑战
+
+   在开发过程中，我遇到了一些挑战，例如...
+
+   ## 学到的经验
+
+   通过这个项目，我学到了...
+   ```
+
+## 创建项目列表页面
+
+1. 更新 `src/app/projects/page.js` 以使用文件系统中的项目数据：
+   ```jsx
+   import Navbar from '@/components/Navbar';
+   import Footer from '@/components/Footer';
+   import ProjectCard from '@/components/ProjectCard';
+   import PageTransition from '@/components/PageTransition';
+   
+   import { getSortedProjectsData } from '@/data/projects';
+   import { getPersonalInfo } from '@/data/personal';
+   
+   export default function Projects() {
+     const projects = getSortedProjectsData();
+     const personalInfo = getPersonalInfo();
+     
+     return (
+       <div className="min-h-screen flex flex-col">
+         <Navbar />
+         <PageTransition>
+           <main className="flex-grow max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+             <h1 className="text-3xl font-bold mb-8">我的项目</h1>
+             
+             {projects.length === 0 ? (
+               <p>暂无项目</p>
+             ) : (
+               <div className="grid md:grid-cols-2 gap-8">
+                 {projects.map((project) => (
+                   <ProjectCard key={project.id} project={{
+                     ...project,
+                     link: `/projects/${project.id}`
+                   }} />
+                 ))}
+               </div>
+             )}
+           </main>
+         </PageTransition>
+         <Footer personalInfo={personalInfo} />
+       </div>
+     );
+   }
+   ```
+
+## 创建项目详情页面
+
+1. 创建 `src/app/projects/[id]/page.js` 文件：
+   ```jsx
+   import Navbar from '@/components/Navbar';
+   import Footer from '@/components/Footer';
+   import PageTransition from '@/components/PageTransition';
+   import { Github, ExternalLink } from 'lucide-react';
+   
+   import { getAllProjectIds, getProjectData } from '@/data/projects';
+   import { getPersonalInfo } from '@/data/personal';
+   import { formatDate } from '@/lib/utils';
+   import { markdownToHtml } from '@/lib/markdown';
+   
+   // 生成静态路径
+   export async function generateStaticParams() {
+     const paths = getAllProjectIds();
+     return paths;
+   }
+   
+   export default async function Project({ params }) {
+     const { id } = params;
+     const projectData = await getProjectData(id);
+     const personalInfo = getPersonalInfo();
+     
+     // 将Markdown转换为HTML
+     const contentHtml = await markdownToHtml(projectData.content);
+     
+     return (
+       <div className="min-h-screen flex flex-col">
+         <Navbar />
+         <PageTransition>
+           <main className="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+             <article>
+               <header className="mb-8">
+                 <div className="flex flex-wrap gap-2 mb-4">
+                   {projectData.tags && projectData.tags.map((tag) => (
+                     <span key={tag} className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800">
+                       {tag}
+                     </span>
+                   ))}
+                 </div>
+                 
+                 <div className="flex items-center mb-4">
+                   <span className="text-5xl mr-4">{projectData.emoji}</span>
+                   <h1 className="text-4xl font-bold">{projectData.title}</h1>
+                 </div>
+                 
+                 <div className="flex flex-wrap items-center gap-4 mb-4">
+                   <div className="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+                     {projectData.status}
+                   </div>
+                   <div className="text-gray-500 dark:text-gray-400">
+                     {formatDate(projectData.date)}
+                   </div>
+                 </div>
+                 
+                 <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
+                   {projectData.description}
+                 </p>
+                 
+                 <div className="flex flex-wrap gap-4">
+                   {projectData.github && (
+                     <a 
+                       href={projectData.github} 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-white transition"
+                     >
+                       <Github size={18} />
+                       <span>查看源码</span>
+                     </a>
+                   )}
+                   
+                   {projectData.demo && (
+                     <a 
+                       href={projectData.demo} 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition"
+                     >
+                       <ExternalLink size={18} />
+                       <span>查看演示</span>
+                     </a>
+                   )}
+                 </div>
+               </header>
+               
+               <div className="prose dark:prose-invert max-w-none">
+                 <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
+               </div>
+             </article>
+           </main>
+         </PageTransition>
+         <Footer personalInfo={personalInfo} />
+       </div>
+     );
+   }
+   ```
+
+## 创建项目筛选功能
+
+1. 创建 `src/components/ProjectFilter.jsx` 组件：
+   ```jsx
+   'use client';
+   
+   export default function ProjectFilter({ tags, statuses, selectedTag, selectedStatus, onSelectTag, onSelectStatus }) {
+     return (
+       <div className="mb-8">
+         <div className="mb-4">
+           <h3 className="text-lg font-medium mb-2">技术标签</h3>
+           <div className="flex flex-wrap gap-2">
+             <button
+               onClick={() => onSelectTag(null)}
+               className={`px-3 py-1 rounded-full text-sm ${
+                 selectedTag === null
+                   ? 'bg-blue-500 text-white'
+                   : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+               }`}
+             >
+               全部
+             </button>
+             {tags.map((tag) => (
+               <button
+                 key={tag}
+                 onClick={() => onSelectTag(tag)}
+                 className={`px-3 py-1 rounded-full text-sm ${
+                   selectedTag === tag
+                     ? 'bg-blue-500 text-white'
+                     : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                 }`}
+               >
+                 {tag}
+               </button>
+             ))}
+           </div>
+         </div>
+         
+         <div>
+           <h3 className="text-lg font-medium mb-2">项目状态</h3>
+           <div className="flex flex-wrap gap-2">
+             <button
+               onClick={() => onSelectStatus(null)}
+               className={`px-3 py-1 rounded-full text-sm ${
+                 selectedStatus === null
+                   ? 'bg-blue-500 text-white'
+                   : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+               }`}
+             >
+               全部
+             </button>
+             {statuses.map((status) => (
+               <button
+                 key={status}
+                 onClick={() => onSelectStatus(status)}
+                 className={`px-3 py-1 rounded-full text-sm ${
+                   selectedStatus === status
+                     ? 'bg-blue-500 text-white'
+                     : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                 }`}
+               >
+                 {status}
+               </button>
+             ))}
+           </div>
+         </div>
+       </div>
+     );
+   }
+   ```
+
+2. 更新 `src/app/projects/page.js` 以添加筛选功能：
+   ```jsx
+   'use client';
+   
+   import { useState, useEffect } from 'react';
+   import Navbar from '@/components/Navbar';
+   import Footer from '@/components/Footer';
+   import ProjectCard from '@/components/ProjectCard';
+   import ProjectFilter from '@/components/ProjectFilter';
+   import PageTransition from '@/components/PageTransition';
+   
+   export default function Projects() {
+     const [projects, setProjects] = useState([]);
+     const [filteredProjects, setFilteredProjects] = useState([]);
+     const [selectedTag, setSelectedTag] = useState(null);
+     const [selectedStatus, setSelectedStatus] = useState(null);
+     const [allTags, setAllTags] = useState([]);
+     const [allStatuses, setAllStatuses] = useState([]);
+     const [loading, setLoading] = useState(true);
+     
+     // 获取所有项目
+     useEffect(() => {
+       async function fetchProjects() {
+         try {
+           const response = await fetch('/api/projects');
+           const data = await response.json();
+           setProjects(data);
+           setFilteredProjects(data);
+           
+           // 提取所有唯一标签
+           const tags = new Set();
+           const statuses = new Set();
+           
+           data.forEach(project => {
+             if (project.tags) {
+               project.tags.forEach(tag => tags.add(tag));
+             }
+             if (project.status) {
+               statuses.add(project.status);
+             }
+           });
+           
+           setAllTags(Array.from(tags));
+           setAllStatuses(Array.from(statuses));
+           
+           setLoading(false);
+         } catch (error) {
+           console.error('获取项目失败:', error);
+           setLoading(false);
+         }
+       }
+       
+       fetchProjects();
+     }, []);
+     
+     // 处理标签筛选
+     const handleTagSelect = (tag) => {
+       setSelectedTag(tag);
+       filterProjects(tag, selectedStatus);
+     };
+     
+     // 处理状态筛选
+     const handleStatusSelect = (status) => {
+       setSelectedStatus(status);
+       filterProjects(selectedTag, status);
+     };
+     
+     // 筛选项目
+     const filterProjects = (tag, status) => {
+       let filtered = projects;
+       
+       // 按标签筛选
+       if (tag) {
+         filtered = filtered.filter(project => 
+           project.tags && project.tags.includes(tag)
+         );
+       }
+       
+       // 按状态筛选
+       if (status) {
+         filtered = filtered.filter(project => 
+           project.status === status
+         );
+       }
+       
+       setFilteredProjects(filtered);
+     };
+     
+     return (
+       <div className="min-h-screen flex flex-col">
+         <Navbar />
+         <PageTransition>
+           <main className="flex-grow max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+             <h1 className="text-3xl font-bold mb-8">我的项目</h1>
+             
+             <div className="md:flex md:gap-8">
+               <div className="md:w-1/4 mb-8 md:mb-0">
+                 <ProjectFilter 
+                   tags={allTags} 
+                   statuses={allStatuses}
+                   selectedTag={selectedTag} 
+                   selectedStatus={selectedStatus}
+                   onSelectTag={handleTagSelect} 
+                   onSelectStatus={handleStatusSelect}
+                 />
+               </div>
+               
+               <div className="md:w-3/4">
+                 {loading ? (
+                   <p>加载中...</p>
+                 ) : filteredProjects.length === 0 ? (
+                   <p>没有找到符合条件的项目</p>
+                 ) : (
+                   <div className="grid md:grid-cols-2 gap-8">
+                     {filteredProjects.map((project) => (
+                       <ProjectCard key={project.id} project={{
+                         ...project,
+                         link: `/projects/${project.id}`
+                       }} />
+                     ))}
+                   </div>
+                 )}
+               </div>
+             </div>
+           </main>
+         </PageTransition>
+         <Footer />
+       </div>
+     );
+   }
+   ```
+
+3. 创建 API 路由以获取项目数据。创建 `src/app/api/projects/route.js` 文件：
+   ```javascript
+   import { getSortedProjectsData } from '@/data/projects';
+   import { NextResponse } from 'next/server';
+   
+   export async function GET() {
+     const projects = getSortedProjectsData();
+     return NextResponse.json(projects);
+   }
+   ```
+
+## 添加项目截图展示
+
+1. 创建 `src/components/ImageGallery.jsx` 组件：
+   ```jsx
+   'use client';
+   
+   import { useState } from 'react';
+   import Image from 'next/image';
+   import { X } from 'lucide-react';
+   
+   export default function ImageGallery({ images }) {
+     const [selectedImage, setSelectedImage] = useState(null);
+     
+     const openImage = (index) => {
+       setSelectedImage(index);
+     };
+     
+     const closeImage = () => {
+       setSelectedImage(null);
+     };
+     
+     const nextImage = () => {
+       setSelectedImage((prev) => (prev + 1) % images.length);
+     };
+     
+     const prevImage = () => {
+       setSelectedImage((prev) => (prev - 1 + images.length) % images.length);
+     };
+     
+     return (
+       <div className="my-8">
+         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+           {images.map((image, index) => (
+             <div 
+               key={index} 
+               className="relative aspect-video cursor-pointer overflow-hidden rounded-lg"
+               onClick={() => openImage(index)}
+             >
+               <Image
+                 src={image.src}
+                 alt={image.alt || `项目截图 ${index + 1}`}
+                 width={400}
+                 height={225}
+                 className="object-cover w-full h-full transition-transform hover:scale-105"
+               />
+             </div>
+           ))}
+         </div>
+         
+         {selectedImage !== null && (
+           <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
+             <button 
+               className="absolute top-4 right-4 text-white p-2 rounded-full bg-gray-800 hover:bg-gray-700"
+               onClick={closeImage}
+             >
+               <X size={24} />
+             </button>
+             
+             <div className="relative max-w-4xl max-h-[80vh]">
+               <Image
+                 src={images[selectedImage].src}
+                 alt={images[selectedImage].alt || `项目截图 ${selectedImage + 1}`}
+                 width={1200}
+                 height={675}
+                 className="object-contain max-h-[80vh]"
+               />
+               
+               {images[selectedImage].caption && (
+                 <div className="text-white text-center mt-2">
+                   {images[selectedImage].caption}
+                 </div>
+               )}
+               
+               <div className="absolute inset-y-0 left-0 flex items-center">
+                 <button 
+                   className="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-full"
+                   onClick={prevImage}
+                 >
+                   &lt;
+                 </button>
+               </div>
+               
+               <div className="absolute inset-y-0 right-0 flex items-center">
+                 <button 
+                   className="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-full"
+                   onClick={nextImage}
+                 >
+                   &gt;
+                 </button>
+               </div>
+             </div>
+           </div>
+         )}
+       </div>
+     );
+   }
+   ```
+
+2. 更新项目详情页以包含图片库：
+   ```jsx
+   import ImageGallery from '@/components/ImageGallery';
+   
+   export default async function Project({ params }) {
+     // ...
+     
+     // 项目截图（这些可以从项目数据中获取，或者从特定目录中读取）
+     const projectImages = projectData.images || [
+       {
+         src: '/images/projects/default.jpg',
+         alt: '项目截图',
+         caption: '项目默认截图'
+       }
+     ];
+     
+     return (
+       <div className="min-h-screen flex flex-col">
+         <Navbar />
+         <PageTransition>
+           <main className="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+             <article>
+               {/* ... */}
+               
+               {projectImages.length > 0 && (
+                 <div className="my-8">
+                   <h2 className="text-2xl font-bold mb-4">项目截图</h2>
+                   <ImageGallery images={projectImages} />
+                 </div>
+               )}
+               
+               <div className="prose dark:prose-invert max-w-none">
+                 <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
+               </div>
+             </article>
+           </main>
+         </PageTransition>
+         <Footer personalInfo={personalInfo} />
+       </div>
+     );
+   }
+   ```
+
+完成这些步骤后，你将拥有一个功能完善的项目展示系统，包括项目列表、详情页、筛选功能和图片展示。

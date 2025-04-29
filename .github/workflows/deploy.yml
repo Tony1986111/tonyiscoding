@@ -1,0 +1,29 @@
+name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches:
+      - main  # 替换为你的默认分支名
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.DO_DEPLOY_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        ssh-keyscan -H 170.64.140.205 >> ~/.ssh/known_hosts
+
+    - name: Deploy code to DigitalOcean
+      run: |
+        rsync -avz --delete ./ root@170.64.140.205:/home/blog/
+
+    - name: Restart application with PM2
+      run: |
+        ssh root@170.64.140.205 'cd /home/blog && npm install && pm2 stop blog || true && pm2 start npm --name "blog" -- start -- --port 3008 || pm2 restart blog'
