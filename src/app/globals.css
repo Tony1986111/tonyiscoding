@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 自定义全局样式 */
+@layer base {
+  body {
+    @apply antialiased;
+  }
+
+  /* 暗黑模式样式 */
+  .dark body {
+    @apply bg-gray-900 text-gray-100;
+  }
+
+  /* 亮色模式样式 */
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
