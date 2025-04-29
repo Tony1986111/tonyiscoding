@@ -26,4 +26,4 @@ jobs:
 
     - name: Restart application with PM2
       run: |
-        ssh root@170.64.140.205 'cd /home/blog && npm install && pm2 stop blog || true && pm2 start npm --name "blog" -- start -- --port 3008 || pm2 restart blog'
+        ssh root@170.64.140.205 'cd /home/blog && npm install && pm2 stop blog || true && pm2 start npm --name "blog" -- start -- -p 3008 || pm2 restart blog'

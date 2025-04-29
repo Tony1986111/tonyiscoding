@@ -50,13 +50,13 @@ export default function Home() {
               <h2 className="section-title font-heading">My Learning Journey</h2>
             </div>
 
-            <div className={`relative border-l-2 ${darkMode ? 'border-gray-800' : 'border-gray-200'} pl-6 sm:pl-8 ml-4 sm:ml-6 space-y-8 sm:space-y-12`}>
+            <div className={`relative border-l-2 ${darkMode ? 'border-gray-800' : 'border-gray-200'} pl-10 sm:pl-12 ml-4 sm:ml-6 space-y-8 sm:space-y-12`}>
               {journey.map((item, index) => (
                 <div key={index} className="animate-fadeIn" style={{ animationDelay: `${index * 0.2}s` }}>
                   <div className={`absolute -left-4 w-7 h-7 rounded-full ${darkMode ? 'bg-gray-800' : 'bg-gray-200'} flex items-center justify-center shadow-md`}>
                     <div className={`w-3 h-3 rounded-full ${darkMode ? 'bg-blue-400' : 'bg-blue-500'}`}></div>
                   </div>
-                  <div className={`text-xs sm:text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'} pl-1`}>{item.period}</div>
+                  <div className={`text-xs sm:text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'} -ml-6 mb-1`}>{item.period}</div>
                   <h3 className="font-heading text-lg sm:text-xl font-bold mt-1 mb-2">{item.title}</h3>
                   <p className="text-sm sm:text-base opacity-80">{item.description}</p>
                 </div>

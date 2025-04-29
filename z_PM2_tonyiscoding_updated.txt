@@ -1,0 +1,167 @@
+# PM2 常用命令 - Tony's Personal Website 项目
+
+## 基本操作命令
+
+# 查看所有运行的进程
+pm2 list
+# 解释: 显示所有PM2管理的进程，包括tonyiscoding-website的状态
+
+# 查看指定应用的日志
+pm2 logs tonyiscoding-website
+# 解释: 实时查看个人网站应用的日志输出
+
+# 限制查看日志的行数
+pm2 logs tonyiscoding-website --lines 100
+# 解释: 查看个人网站应用最后100行日志
+
+# 清除日志
+pm2 flush tonyiscoding-website
+# 解释: 清除个人网站应用的日志文件
+
+# 重启应用
+pm2 restart tonyiscoding-website
+# 解释: 重启个人网站应用
+
+# 重载应用(几乎无停机重启)
+pm2 reload tonyiscoding-website
+# 解释: 平滑重载个人网站应用，对用户影响最小
+
+# 停止应用
+pm2 stop tonyiscoding-website
+# 解释: 停止个人网站应用
+
+# 停止所有应用
+pm2 stop all
+# 解释: 停止所有PM2管理的进程
+
+# 删除应用
+pm2 delete tonyiscoding-website
+# 解释: 从PM2管理中移除个人网站应用
+
+# 删除所有应用
+pm2 delete all
+# 解释: 从PM2管理中移除所有应用
+
+## 项目特定的启动命令
+
+# 启动个人网站 (端口3008) - 方法1：直接指定端口
+pm2 start npm --name "tonyiscoding-website" -- start -- -p 3008
+# 解释: 使用npm start命令启动个人网站应用，明确指定使用3008端口
+
+# 启动个人网站 (端口3008) - 方法2：使用环境变量
+PORT=3008 pm2 start npm --name "tonyiscoding-website" -- start
+# 解释: 通过环境变量设置端口，然后启动应用
+
+# 启动个人网站 (端口3008) - 方法3：使用ecosystem配置文件（推荐方式）
+# 首先创建ecosystem.config.js文件:
+# module.exports = {
+#   apps: [{
+#     name: "tonyiscoding-website",
+#     script: "npm",
+#     args: "start",
+#     env: {
+#       PORT: 3008,
+#       NODE_ENV: "production"
+#     },
+#     watch: false
+#   }]
+# }
+pm2 start ecosystem.config.js
+# 解释: 使用配置文件启动，确保端口和环境变量正确设置
+
+# 启动个人网站 (端口3008) - 方法4：直接启动Next.js
+pm2 start node_modules/next/dist/bin/next -- start -p 3008
+# 解释: 直接使用Next.js的启动脚本，明确指定端口3008
+
+# 开发模式启动个人网站 (端口3008)
+pm2 start npm --name "tonyiscoding-website-dev" -- run dev -- -p 3008
+# 解释: 使用npm run dev命令启动个人网站的开发模式，明确指定使用3008端口
+
+# 保存PM2配置
+pm2 save
+# 解释: 保存当前PM2进程列表，确保服务器重启后应用自动重启
+
+# 设置PM2开机自启
+pm2 startup
+# 解释: 生成PM2开机自启脚本，需要根据提示执行生成的命令
+
+## 监控和管理命令
+
+# 查看应用详细信息
+pm2 show tonyiscoding-website
+# 解释: 显示个人网站应用的详细运行信息，包括内存使用、重启次数等
+
+# 监控应用资源使用
+pm2 monit
+# 解释: 实时监控所有应用的CPU和内存使用情况
+
+# 查看启动错误
+pm2 logs tonyiscoding-website --err --lines 50
+# 解释: 只查看个人网站应用最近50行错误日志
+
+# 重置应用计数器
+pm2 reset tonyiscoding-website
+# 解释: 重置个人网站应用的重启计数器
+
+## 排查端口问题的命令
+
+# 检查3008端口占用
+lsof -i:3008
+# 解释: 查看哪些进程正在使用3008端口
+
+# 检查3000端口占用（默认Next.js端口）
+lsof -i:3000
+# 解释: 查看哪些进程正在使用3000端口
+
+# 查看所有监听端口
+netstat -tulpn | grep LISTEN
+# 解释: 显示所有正在监听的TCP和UDP端口
+
+# 强制杀死占用3008端口的进程
+fuser -k 3008/tcp
+# 解释: 强制杀死占用3008端口的进程，解决端口冲突问题
+
+# 强制杀死占用3000端口的进程
+fuser -k 3000/tcp
+# 解释: 强制杀死占用3000端口的进程，解决端口冲突问题
+
+## GitHub Actions 部署后的命令
+
+# 在GitHub Actions部署后重启应用（修正版，明确指定端口）
+ssh root@170.64.140.205 'cd /home/blog && npm install && pm2 stop blog || true && pm2 start npm --name "blog" -- start -- -p 3008 || pm2 restart blog'
+
+# 手动执行相同的部署后重启命令（修正版，明确指定端口）
+cd /home/blog && npm install && pm2 stop blog || true && pm2 start npm --name "blog" -- start -- -p 3008 || pm2 restart blog
+
+## 一键启动项目的命令
+
+# 一键启动个人网站（修正版，明确指定端口）
+pm2 delete tonyiscoding-website || true && pm2 start npm --name "tonyiscoding-website" -- start -- -p 3008 && pm2 save
+# 解释: 删除现有进程(如果存在)，启动个人网站应用并明确指定端口，然后保存配置
+
+# 使用生产构建启动个人网站的完整流程（修正版，明确指定端口）
+cd /home/blog && npm install && npm run build && pm2 delete tonyiscoding-website || true && pm2 start npm --name "tonyiscoding-website" -- start -- -p 3008 && pm2 save
+# 解释: 安装依赖，构建生产版本，删除现有进程(如果存在)，启动个人网站应用并明确指定端口，然后保存配置
+
+## 使用ecosystem.config.js的完整设置（推荐方式）
+
+# 创建ecosystem.config.js文件
+cat > ecosystem.config.js << 'EOL'
+module.exports = {
+  apps: [{
+    name: "tonyiscoding-website",
+    script: "npm",
+    args: "start",
+    env: {
+      PORT: 3008,
+      NODE_ENV: "production"
+    },
+    watch: false,
+    max_memory_restart: "300M"
+  }]
+}
+EOL
+
+# 使用配置文件启动应用
+pm2 delete tonyiscoding-website || true && pm2 start ecosystem.config.js && pm2 save
+# 解释: 删除现有进程(如果存在)，使用配置文件启动应用，然后保存配置
