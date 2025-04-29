@@ -3,7 +3,7 @@ name: Deploy to DigitalOcean
 on:
   push:
     branches:
-      - main  # 替换为你的默认分支名
+      - main 
 
 jobs:
   deploy:
@@ -24,6 +24,16 @@ jobs:
       run: |
         rsync -avz --delete ./ root@170.64.140.205:/home/blog/
 
-    - name: Restart application with PM2
+    - name: Build and restart application
       run: |
-        ssh root@170.64.140.205 'cd /home/blog && npm install && pm2 stop blog || true && pm2 start npm --name "blog" -- start -- -p 3008 || pm2 restart blog'
+        ssh root@170.64.140.205 'cd /home/blog &&
+          # 安装依赖（必须保留，确保新代码的依赖都已安装）
+          npm install &&
+
+          # 构建应用（必须保留，确保新代码被正确构建）
+          npm run build &&
+
+          # 使用PM2重启应用
+          pm2 stop tonyiscoding-website || true &&
+          pm2 start npm --name "tonyiscoding-website" -- start &&
+          pm2 save'
