@@ -1,0 +1,125 @@
+/*!***************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[11].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[11].oneOf[12].use[3]!./src/components/TodoApp/styles/todoapp.css ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************/
+/* TodoApp custom styles */
+
+/* Increase width to 130% */
+.todoapp-container {
+  width: 130%;
+  max-width: 130%;
+  margin-left: -15%;
+}
+
+/* Parent colors */
+.parent-dad {
+  background-color: rgba(191, 219, 254, 0.5); /* blue-100 with transparency */
+}
+
+.parent-mom {
+  background-color: rgba(252, 231, 243, 0.5); /* pink-100 with transparency */
+}
+
+.parent-none {
+  background-color: rgba(243, 244, 246, 0.5); /* gray-100 with transparency */
+}
+
+/* Week selector styles */
+.week-selector {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Activity card hover effects */
+.activity-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.activity-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: #4f46e5;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #4338ca;
+}
+
+.btn-secondary {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: #e5e7eb;
+}
+
+/* Animation for notifications */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #c5c5c5;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .todoapp-container {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none;
+  }
+  
+  .todoapp-container {
+    width: 100%;
+    margin-left: 0;
+  }
+  
+  .activity-card {
+    -moz-column-break-inside: avoid;
+         break-inside: avoid;
+  }
+}
+
