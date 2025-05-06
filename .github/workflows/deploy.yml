@@ -59,7 +59,7 @@ jobs:
             exit 1
           fi
 
-          # 使用PM2重启应用
+          # 使用PM2重启
           pm2 stop tonyiscoding-website || true
 
           if ! pm2 start npm --name "tonyiscoding-website" -- start; then
