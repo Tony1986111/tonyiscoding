@@ -25,9 +25,14 @@ jobs:
     - name: Set up SSH
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.DO_HOST }}" > ~/.ssh/id_ed25519
+        # 使用DO_SSH_KEY存储SSH私钥
+        echo "${{ secrets.DO_SSH_KEY }}" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
+        # 使用DO_HOST存储服务器IP地址
         ssh-keyscan -H ${{ secrets.DO_HOST }} >> ~/.ssh/known_hosts
+        # 添加详细的SSH调试信息
+        echo "Testing SSH connection..."
+        ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 root@${{ secrets.DO_HOST }} 'echo "SSH connection successful"'
       # 添加错误处理
       continue-on-error: false
 
