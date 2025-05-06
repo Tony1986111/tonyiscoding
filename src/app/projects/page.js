@@ -16,9 +16,9 @@ const projects = [
     link: '/projects/personal-website'
   },
   {
-    title: 'Todo App',
-    description: 'A simple todo application using React and localStorage for data storage.',
-    tags: ['React', 'CSS', 'LocalStorage'],
+    title: 'Family Schedule App',
+    description: 'A family schedule management application with parent role distinction and database storage.',
+    tags: ['React', 'MySQL', 'Next.js'],
     emoji: '📝',
     status: 'Completed',
     link: '/projects/todo-app'
@@ -48,13 +48,15 @@ export default function Projects() {
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
       <Navbar />
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h1 className="text-3xl font-bold mb-8">My Projects</h1>
+      <main className="w-full py-16">
+        <div className="full-width-container px-4 sm:px-6 lg:px-8">
+          <h1 className="text-3xl font-bold mb-8">My Projects</h1>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {projects.map((project, index) => (
-            <ProjectCard key={index} project={project} />
-          ))}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {projects.map((project, index) => (
+              <ProjectCard key={index} project={project} />
+            ))}
+          </div>
         </div>
       </main>
 

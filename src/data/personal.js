@@ -1,12 +1,22 @@
 export const personalInfo = {
   name: 'Tony Ye',
-  title: 'Frontend Developer Learner',
+  title: 'Full-Stack',
   email: 'alei198634@gmail.com',
   github: 'https://github.com/Tony1986111',
   twitter: 'https://x.com/alei198634',
   linkedin: 'https://www.linkedin.com/in/delai-ye-2551b092/',
   website: 'https://tonyiscoding.xyz',
+  shortBio: 'Focused on creating high-performance apps and websites',
   bio: 'I am a learner transitioning to the IT industry, currently focusing on frontend development technologies.',
+  about: 'As a full-stack developer, I have rich learning experience, focusing on building responsive, high-performance modern websites and applications.',
+  strengths: [
+    'Fast delivery, efficient communication',
+    'Focus on code quality and user experience'
+  ],
+  stats: {
+    completedProjects: '5+',
+    clientSatisfaction: '95%'
+  },
   longBio: `
     I have a background in business and finance, and now I'm learning web development and programming.
 

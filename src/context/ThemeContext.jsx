@@ -5,7 +5,7 @@ import { createContext, useState, useContext, useEffect } from 'react';
 const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(false); // 默认为 light 模式
   const [mounted, setMounted] = useState(false);
 
   // Check user's previous preference after client-side mount

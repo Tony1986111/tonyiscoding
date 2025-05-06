@@ -12,7 +12,7 @@ export default function Contact() {
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
       <Navbar />
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <main className="full-width-container px-4 sm:px-6 lg:px-8 py-16">
         <h1 className="text-3xl font-bold mb-8">Contact Me</h1>
 
         <div className="md:flex md:gap-12">

@@ -10,7 +10,7 @@ export default function Hero() {
 
   return (
     <div className="pt-24 md:pt-32 pb-12 md:pb-16 animate-fadeIn">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="full-width-container px-4 sm:px-6 lg:px-8">
         <div className="md:flex items-center">
           <div className="md:w-2/3 md:pr-8">
             <div className={`inline-block px-3 py-1 rounded-md text-sm font-medium mb-4 ${darkMode ? 'bg-blue-900 text-blue-100' : 'bg-blue-100 text-blue-800'}`}>

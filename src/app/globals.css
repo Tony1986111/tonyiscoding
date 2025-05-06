@@ -21,6 +21,19 @@
 
 /* Custom component styles */
 @layer components {
+  /* Full-width container with minimal side margins */
+  .full-width-container {
+    @apply w-full max-w-[98%] md:max-w-[96%] lg:max-w-[1800px] mx-auto;
+  }
+
+  /* Container that spans the entire viewport width */
+  .viewport-width-container {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    box-sizing: border-box;
+  }
+
   .btn {
     @apply px-4 py-2 rounded-lg font-medium transition;
   }

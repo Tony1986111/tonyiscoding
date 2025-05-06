@@ -1,11 +1,21 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useTheme } from '@/context/ThemeContext';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import Hero from '@/components/Hero';
-import ProjectCard from '@/components/ProjectCard';
-import Link from 'next/link';
+import DarkTechLayout from '@/components/DarkTechLayout';
+import { clearColorMap } from '@/utils/randomColors';
+import BusinessCard from '@/components/ui/BusinessCard';
+import TechOverview from '@/components/ui/TechOverview';
+import ClientProjects from '@/components/ui/ClientProjects';
+import TechStack from '@/components/ui/TechStack';
+import AboutMe from '@/components/ui/AboutMe';
+import LatestArticles from '@/components/ui/LatestArticles';
+import Contact from '@/components/ui/Contact';
+import ProjectShowcase from '@/components/ui/ProjectShowcase';
+import Navigation from '@/components/ui/Navigation';
+import FooterInfo from '@/components/ui/FooterInfo';
+import LearningJourney from '@/components/ui/LearningJourney';
+
 import { getAllSkills } from '@/data/skills';
 import { getPersonalInfo } from '@/data/personal';
 
@@ -14,113 +24,137 @@ const skills = getAllSkills();
 const personalInfo = getPersonalInfo();
 const journey = personalInfo.journey;
 
-// Sample projects (in a real app, this would come from the data files)
-// We're using sample data here because the file-based data requires server components
-const projects = [
+// Project data (using original project data)
+const featuredProjects = [
   {
     title: 'Personal Website',
-    description: 'A personal website built with Next.js and React to showcase my projects and blog.',
+    description: 'A personal website built with Next.js and React to showcase my projects and blog',
     tags: ['Next.js', 'React', 'Tailwind CSS'],
-    emoji: '🌐',
+    icon: 'Globe',
     status: 'In Progress'
   },
   {
     title: 'Todo App',
-    description: 'A simple todo application using React and localStorage for data storage.',
+    description: 'A simple todo application using React and localStorage for data storage',
     tags: ['React', 'CSS', 'LocalStorage'],
-    emoji: '📝',
+    icon: 'Code',
     status: 'Completed'
+  },
+  {
+    title: 'Learning Projects',
+    description: 'Collection of small projects from my learning journey',
+    tags: ['JavaScript', 'HTML/CSS', 'React'],
+    icon: 'Layers',
+    status: 'Ongoing'
+  }
+];
+
+// Sample article data
+const featuredPosts = [
+  {
+    title: 'My Coding Journey',
+    date: '2024-04-15',
+    slug: 'my-coding-journey'
+  },
+  {
+    title: 'React Basics Summary',
+    date: '2024-03-22',
+    slug: 'react-basics'
+  },
+  {
+    title: 'How to Build a Personal Website with Next.js',
+    date: '2024-02-10',
+    slug: 'nextjs-personal-website'
   }
 ];
 
 export default function Home() {
   const { darkMode } = useTheme();
 
+  // 每次页面加载时清除颜色映射，以便重新随机选择颜色
+  useEffect(() => {
+    clearColorMap();
+  }, []);
+
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
-      <Navbar />
-
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'} pt-4 transition-colors duration-300`}>
       <main>
-        <Hero />
+        <DarkTechLayout>
+          {/* Navigation */}
+          <Navigation />
 
-        {/* Learning Journey Section */}
-        <section id="journey" className="py-12 sm:py-16">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="section-divider">
-              <h2 className="section-title font-heading">My Learning Journey</h2>
-            </div>
+          {/* Business Card */}
+          <BusinessCard
+            name={personalInfo.name}
+            title={personalInfo.title}
+            email={personalInfo.email}
+            link={personalInfo.website}
+          />
 
-            <div className={`relative border-l-2 ${darkMode ? 'border-gray-800' : 'border-gray-200'} pl-6 sm:pl-8 ml-4 sm:ml-6 space-y-8 sm:space-y-12`}>
-              {journey.map((item, index) => (
-                <div key={index} className="animate-fadeIn" style={{ animationDelay: `${index * 0.2}s` }}>
-                  <div className={`absolute -left-4 w-7 h-7 rounded-full ${darkMode ? 'bg-gray-800' : 'bg-gray-200'} flex items-center justify-center shadow-md -top-2`}>
-                    <div className={`w-3 h-3 rounded-full ${darkMode ? 'bg-blue-400' : 'bg-blue-500'} `} ></div>
-                  </div>
-                  <div className={`text-xs sm:text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'} pl-8 -mt-3`}>{item.period}</div>
-                  <h3 className="font-heading text-lg sm:text-xl font-bold mt-1 mb-2">{item.title}</h3>
-                  <p className="text-sm sm:text-base opacity-80">{item.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+          {/* Tech Overview */}
+          <TechOverview skills={skills.filter(s => s.featured)} />
 
-        {/* Skills Section */}
-        <section className="py-12 sm:py-16 bg-gray-50 dark:bg-gray-800">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="section-divider">
-              <h2 className="section-title font-heading">Skills I'm Learning</h2>
-            </div>
+          {/* Client Projects */}
+          <ClientProjects
+            completed={personalInfo.stats.completedProjects}
+            satisfaction={personalInfo.stats.clientSatisfaction}
+          />
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
-              {skills.map((skill, index) => (
-                <div key={index} className={`p-3 sm:p-4 rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white hover:bg-gray-100'} transition shadow-sm`}>
-                  <div className="flex items-center mb-2">
-                    <span className="text-xl mr-2">{skill.icon}</span>
-                    <span className="font-medium text-sm sm:text-base">{skill.name}</span>
-                  </div>
-                  <div className={`inline-block px-2 py-1 text-xs rounded-full ${
-                    skill.level === 'Expert'
-                      ? (darkMode ? 'bg-green-900 text-green-100' : 'bg-green-100 text-green-800')
-                      : skill.level === 'Intermediate'
-                        ? (darkMode ? 'bg-blue-900 text-blue-100' : 'bg-blue-100 text-blue-800')
-                        : skill.level === 'Beginner'
-                          ? (darkMode ? 'bg-yellow-900 text-yellow-100' : 'bg-yellow-100 text-yellow-800')
-                          : (darkMode ? 'bg-purple-900 text-purple-100' : 'bg-purple-100 text-purple-800')
-                  }`}>
-                    {skill.level}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+          {/* Frontend Tech Stack */}
+          <TechStack
+            title="Frontend"
+            icon="Code"
+            skills={skills.filter(s => s.category === 'frontend').slice(0, 6)}
+            gradientFrom="purple-900"
+            gradientTo="blue-900"
+          />
 
-        {/* Projects Section */}
-        <section id="projects" className="py-12 sm:py-16">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="section-divider">
-              <h2 className="section-title font-heading">My Projects</h2>
-            </div>
+          {/* Backend Tech Stack */}
+          <TechStack
+            title="Backend"
+            icon="Server"
+            skills={skills.filter(s => s.category === 'backend').slice(0, 6)}
+            gradientFrom="blue-900"
+            gradientTo="cyan-900"
+          />
 
-            <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
-              {projects.map((project, index) => (
-                <ProjectCard key={index} project={project} />
-              ))}
-            </div>
+          {/* Design Tech Stack */}
+          <TechStack
+            title="Design"
+            icon="PenTool"
+            skills={skills.filter(s => s.category === 'design').slice(0, 6)}
+            gradientFrom="green-900"
+            gradientTo="teal-900"
+          />
 
-            <div className="mt-12 p-4 sm:p-6 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-              <h3 className="font-heading text-lg sm:text-xl font-bold mb-3">Looking to Learn and Collaborate</h3>
-              <p className="mb-4 text-sm sm:text-base">I'm at the beginning of my development journey and eager to learn through real projects. If you're looking for a motivated beginner, I'd love to collaborate!</p>
-              <Link href="/contact" className="btn bg-white text-blue-700 hover:bg-gray-100">
-                Contact Me
-              </Link>
-            </div>
-          </div>
-        </section>
+          {/* DevOps Tech Stack */}
+          <TechStack
+            title="DevOps"
+            icon="Globe"
+            skills={skills.filter(s => s.category === 'devops').slice(0, 6)}
+            gradientFrom="yellow-900"
+            gradientTo="orange-900"
+          />
+
+          {/* Learning Journey */}
+          <LearningJourney journey={journey} />
+
+          {/* Project Showcase */}
+          <ProjectShowcase projects={featuredProjects} />
+
+          {/* About Me */}
+          <AboutMe about={personalInfo.about} strengths={personalInfo.strengths} />
+
+          {/* Latest Articles */}
+          <LatestArticles posts={featuredPosts} />
+
+          {/* Contact */}
+          <Contact email={personalInfo.email} github={personalInfo.github} />
+
+          {/* Footer Info */}
+          <FooterInfo personalInfo={personalInfo} />
+        </DarkTechLayout>
       </main>
-
-      <Footer />
     </div>
   );
 }

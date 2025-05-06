@@ -33,6 +33,26 @@ module.exports = {
           },
         },
       },
+      // Increase container max-width
+      maxWidth: {
+        '8xl': '90rem', // 1440px
+        '9xl': '100rem', // 1600px
+      },
+      // Adjust container padding
+      padding: {
+        container: '1rem',
+        'container-md': '2rem',
+        'container-lg': '4rem',
+      },
+    },
+    // Override container defaults
+    container: {
+      center: true,
+      padding: {
+        DEFAULT: '1rem',
+        sm: '2rem',
+        lg: '4rem',
+      },
     },
   },
   plugins: [
