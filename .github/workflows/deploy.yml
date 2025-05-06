@@ -22,24 +22,22 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-
 
-    # 使用官方的SSH Actions来处理SSH连接
-    - name: Install SSH key
-      uses: shimataro/ssh-key-action@v2
-      with:
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        if_key_exists: replace
-
-    - name: Adding Known Hosts
-      run: ssh-keyscan -H ${{ secrets.DO_HOST }} >> ~/.ssh/known_hosts
+    # 使用直接的SSH设置方式
+    - name: Set up SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.DO_HOST }} >> ~/.ssh/id_rsa
 
     - name: Test SSH connection
       run: |
         echo "Testing SSH connection..."
-        ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USERNAME }}@${{ secrets.DO_HOST }} 'echo "SSH connection successful"'
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.DO_USERNAME }}@${{ secrets.DO_HOST }} 'echo "SSH connection successful"'
 
     - name: Deploy code to DigitalOcean
       run: |
-        if ! rsync -avz ./ ${{ secrets.DO_USERNAME }}@${{ secrets.DO_HOST }}:/home/blog/; then
+        if ! rsync -avz -e "ssh -i ~/.ssh/id_rsa" ./ ${{ secrets.DO_USERNAME }}@${{ secrets.DO_HOST }}:/home/blog/; then
           echo "Failed to deploy code to server"
           exit 1
         fi
@@ -48,7 +46,7 @@ jobs:
 
     - name: Build and restart application
       run: |
-        ssh ${{ secrets.DO_USERNAME }}@${{ secrets.DO_HOST }} 'cd /home/blog && {
+        ssh -i ~/.ssh/id_rsa ${{ secrets.DO_USERNAME }}@${{ secrets.DO_HOST }} 'cd /home/blog && {
           # 安装依赖
           if ! npm install; then
             echo "Failed to install dependencies"
