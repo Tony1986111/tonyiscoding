@@ -60,9 +60,9 @@ jobs:
           fi
 
           # 使用PM2重启
-          pm2 stop tonyiscoding-website || true
+          pm2 stop tonyiscoding || true
 
-          if ! pm2 start npm --name "tonyiscoding-website" -- start; then
+          if ! pm2 start npm --name "tonyiscoding" -- start; then
             echo "Failed to start application"
             exit 1
           fi
