@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTheme } from '@/context/ThemeContext';
+import { useGSAP } from '@gsap/react';
 import DarkTechLayout from '@/components/DarkTechLayout';
 import { clearColorMap } from '@/utils/randomColors';
 import BusinessCard from '@/components/ui/BusinessCard';
@@ -18,6 +19,7 @@ import LearningJourney from '@/components/ui/LearningJourney';
 
 import { getAllSkills } from '@/data/skills';
 import { getPersonalInfo } from '@/data/personal';
+import { playEntranceAnimation } from '@/utils/animations';
 
 // Get data
 const skills = getAllSkills();
@@ -70,14 +72,23 @@ const featuredPosts = [
 
 export default function Home() {
   const { darkMode } = useTheme();
+  const containerRef = useRef(null);
 
   // 每次页面加载时清除颜色映射，以便重新随机选择颜色
   useEffect(() => {
     clearColorMap();
   }, []);
 
+  // 使用GSAP添加入场动画
+  useGSAP(() => {
+    // 创建入场动画序列
+    playEntranceAnimation({
+      staggerDelay: 0.1
+    });
+  }, { scope: containerRef });
+
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'} pt-4 transition-colors duration-300`}>
+    <div ref={containerRef} className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'} pt-4 transition-colors duration-300`}>
       <main>
         <DarkTechLayout>
           {/* Navigation */}
