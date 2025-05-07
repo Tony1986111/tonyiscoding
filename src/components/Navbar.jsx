@@ -26,7 +26,7 @@ export default function Navbar() {
             <Link href="/" className="hover:text-blue-500 transition">Home</Link>
             <Link href="/projects" className="hover:text-blue-500 transition">Projects</Link>
             <Link href="/blog" className="hover:text-blue-500 transition">Blog</Link>
-            <Link href="/todoapp" className="hover:text-blue-500 transition">TodoApp</Link>
+            <Link href="/projects/todo-app" className="hover:text-blue-500 transition">TodoApp</Link>
             <Link href="/contact" className="hover:text-blue-500 transition">Contact</Link>
             <ThemeToggle />
           </div>
@@ -49,7 +49,7 @@ export default function Navbar() {
             <Link href="/" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800 transition">Home</Link>
             <Link href="/projects" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800 transition">Projects</Link>
             <Link href="/blog" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800 transition">Blog</Link>
-            <Link href="/todoapp" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800 transition">TodoApp</Link>
+            <Link href="/projects/todo-app" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800 transition">TodoApp</Link>
             <Link href="/contact" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-800 transition">Contact</Link>
           </div>
         </div>

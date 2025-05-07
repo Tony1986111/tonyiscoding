@@ -22,7 +22,7 @@ const Navigation = () => {
             <FileText className="h-4 w-4 mr-1 text-purple-400" />
             <span className={`${darkMode ? 'text-white' : 'text-gray-800'} text-sm`}>Blog</span>
           </Link>
-          <Link href="/todoapp" className={`px-2 py-1 rounded-lg ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition flex items-center`}>
+          <Link href="/projects/todo-app" className={`px-2 py-1 rounded-lg ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition flex items-center`}>
             <CheckSquare className="h-4 w-4 mr-1 text-yellow-400" />
             <span className={`${darkMode ? 'text-white' : 'text-gray-800'} text-sm`}>Todo</span>
           </Link>
