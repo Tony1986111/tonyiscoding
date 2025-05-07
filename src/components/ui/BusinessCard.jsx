@@ -201,14 +201,10 @@ const BusinessCard = ({ name, title, email, link }) => {
             <div className="ml-4">
               <span style={propertyStyle}>"link"</span>
               <span>: </span>
-            </div>
-          </div>
-          <div className="mb-1 flex">
-            <span style={lineNumberStyle}></span>
-            <div className="ml-4">
               <span style={valueStyle}>"{link}"</span>
             </div>
           </div>
+    
           <div className="mb-1 flex">
             <span style={lineNumberStyle}>7</span>
             <div>&#125;</div>
